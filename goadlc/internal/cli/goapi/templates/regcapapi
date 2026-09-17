@@ -1,0 +1,7 @@
+{{- $G := .G -}}
+	Register_{{.StructName | public}}(
+		mux,
+		srv.Get{{.Name | public}}(),
+		reqs.{{.Name | public}},
+		{{range .Kids}}{{.Name | lower}}_capr,
+	{{end}})

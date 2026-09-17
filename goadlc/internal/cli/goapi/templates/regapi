@@ -1,0 +1,5 @@
+{{- $G := .G -}}
+	Register_{{.StructName | public}}(
+		mux,
+		srv.Get{{.Name | public}}(),
+	)

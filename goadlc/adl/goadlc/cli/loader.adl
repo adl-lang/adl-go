@@ -1,0 +1,43 @@
+module cli.loader {
+
+import cli.root.Root;
+
+struct Loader {
+    @SerializedName "-"
+    Nullable<Root> Root = null;
+    /// Mapping from ADL bundle to go module
+    Vector<BundleMap> BundleMaps = [];
+    /// Add the specifed directory to the ADL searchpath
+    Vector<String> Searchdir = [];
+    /// File or pattern
+    Vector<String> Files;
+    /// The temp directory used to place intermediate files
+    String WorkingDir = "{{.OS.MkdirTemp \"\" \"goadlc-\"}}";
+    /// Add the specifed adl file extension to merged on loading
+    String MergeAdlext = "";
+    /// The directory used to place cached files (e.g. download adl source)
+    String UserCacheDir = "{{.OS.UserCacheDir}}";
+};
+
+struct BundleMap {
+    String AdlModuleNamePrefix;
+    String GoModPath;
+    String AdlSrc;
+    Nullable<String> GoModVersion = null;
+    Nullable<String> Path = null;
+};
+
+struct LoadResult {
+    StringMap<sys.adlast.Module> CombinedAst;
+    Vector<NamedModule> Modules;
+    Vector<String> Files;
+    Vector<BundleMap> BundleMaps;
+};
+
+struct NamedModule {
+	String Name;
+	Nullable<sys.adlast.Module> Module_;
+};
+
+
+};

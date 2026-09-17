@@ -1,0 +1,12 @@
+module cli.root {
+
+struct Root {
+    /// Print extra diagnostic information, especially about files being read/written
+    Bool Debug = false;
+    /// Config file in json format (NOTE file entries take precedence over command-line flags & env)
+    String Cfg = "";
+    /// Dump the config to stdout and exits
+    Bool DumpConfig = false;
+};
+
+};

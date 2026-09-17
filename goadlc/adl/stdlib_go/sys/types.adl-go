@@ -1,0 +1,38 @@
+module sys.types
+{
+
+import adlc.config.go_.*;
+
+annotation Set GoCustomType {
+  "gotype" : {
+    "name": "MapSet",
+    "type_constraints": ["comparable"],
+    "pkg": "customtypes",
+    "import_path": "github.com/adl-lang/adl-go/adl/customtypes"
+  },
+  "helpers" : {
+    "name": "SetHelper",
+    "ref": {
+      "pkg": "customtypes",
+      "import_path": "github.com/adl-lang/adl-go/adl/customtypes"
+    }
+  }
+};
+
+annotation Map GoCustomType {
+  "gotype" : {
+    "name": "MapMap",
+    "type_constraints": ["comparable", "any"],
+    "pkg": "customtypes",
+    "import_path": "github.com/adl-lang/adl-go/adl/customtypes"
+  },
+  "helpers" : {
+    "name": "MapHelper",
+    "ref": {
+      "pkg": "customtypes",
+      "import_path": "github.com/adl-lang/adl-go/adl/customtypes"
+    }
+  }
+};
+
+};

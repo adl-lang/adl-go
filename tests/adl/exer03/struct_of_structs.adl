@@ -1,0 +1,24 @@
+module exer03.struct_of_structs {
+
+struct StructOfStruct {
+    Foo A;
+    Bar B;
+    Fizz c;
+};
+
+struct Foo {
+    Int32 d;
+};
+
+struct Bar {
+    String d;
+};
+
+
+struct Fizz {
+    Foo A;
+    Bar B;
+    Nullable<Fizz> c;
+};
+
+};

@@ -1,0 +1,80 @@
+module exer03.generics {
+
+@adlc.config.go_.TypeParamConstraintList ["comparable", "any"]
+struct Abc<A,B> {
+    A a;
+    Vector<B> b;
+    Vector<Abc<A,B>> kids = [];
+    StringMap<Abc<Int64,String>> grandkids_named = {
+        "fav": {"grandkids_named": {}, "a": 4321, "b": ["aaa"], "c": 99, "d": {"d": {"a": 22}}, "e": {"a" : 1234}, "f": null}
+    };
+    Int64 c = 66;
+    Def<A,B> d;
+    Def<Int64,String> e = {"a": 1234};
+    Nullable<Abc<Int64,String>> f = {"a": 4321, "b": ["aaa"], "c": 99, "d": {"d": {"a": 22}}, "e": {"a" : 1234}, "f": null};
+};
+
+
+@adlc.config.go_.TypeParamConstraintList ["comparable", "any"]
+struct Zyx<Z,Y> {
+    Abc<Z,Y> a;
+    Abc<sys.types.Either<String,Int64>,String> e;
+    Vector<sys.types.Either<String,sys.types.Either<String,Int64>>> f;
+    Vector<sys.types.Either<Z,sys.types.Either<Z,Int64>>> f1;
+    Vector<sys.types.Either<Z,sys.types.Either<Z,Z>>> f2;
+    Vector<sys.types.Either<String,sys.types.Either<Z,Y>>> f3;
+    sys.types.Either<Vector<String>,sys.types.Either<String,Int64>> g;
+};
+
+
+@adlc.config.go_.TypeParamConstraintList ["comparable", "any"]
+union Def<C,D> {
+@adlc.config.go_.TypeParamConstraintList [ "comparable"]
+    C a;
+@adlc.config.go_.TypeParamConstraintList [ "any"]
+    Vector<D> b;
+    Int64 c;
+@adlc.config.go_.TypeParamConstraintList ["comparable", "any"]
+    Def<C,D> d;
+    Abc<sys.types.Either<String,Int64>,String> e;
+    Vector<sys.types.Either<String,sys.types.Either<String,Int64>>> f;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    Vector<sys.types.Either<C,sys.types.Either<String,Int64>>> f2;
+    sys.types.Either<Vector<String>,sys.types.Either<String,Int64>> g;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    sys.types.Either<Vector<C>,sys.types.Either<C,C>> g1;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    sys.types.Either<Nullable<C>,sys.types.Either<C,C>> g2;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    sys.types.Either<StringMap<C>,sys.types.Either<C,C>> g3;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    sys.types.Either<Vector<String>,sys.types.Either<C,C>> g4;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    sys.types.Either<sys.types.Either<C,C>,Vector<String>> g5;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    sys.types.Either<sys.types.Either<String,String>,Vector<C>> g6;
+@adlc.config.go_.TypeParamConstraintList ["any", "comparable"]
+    sys.types.Either<sys.types.Either<D,String>,Vector<C>> g7;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    sys.types.Either<Vector<C>,Vector<C>> g8;
+@adlc.config.go_.TypeParamConstraintList ["comparable", "any"]
+    sys.types.Either<Vector<C>,Vector<D>> g9;
+@adlc.config.go_.TypeParamConstraintList ["any", "comparable"]
+    sys.types.Either<Vector<D>,Vector<C>> g10;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    Vector<C> h;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    Vector<Vector<C>> i;
+
+    sys.types.Map<String,Int64> m1;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    sys.types.Map<C,Int64> m2;
+@adlc.config.go_.TypeParamConstraintList ["comparable"]
+    sys.types.Map<String,C> m3;
+@adlc.config.go_.TypeParamConstraintList ["comparable", "any"]
+    sys.types.Map<C,D> m4;
+// @adlc.config.go_.TypeParamConstraintList ["comparable", "comparable"]
+//     sys.types.Map<D,C> m5;
+};
+
+};

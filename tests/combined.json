@@ -1,0 +1,1311 @@
+{
+    "sys.types": {
+        "annotations": [],
+        "imports": [
+            {
+                "moduleName": "sys.annotations"
+            }
+        ],
+        "name": "sys.types",
+        "decls": {
+            "Either": {
+                "annotations": [],
+                "type_": {
+                    "union_": {
+                        "typeParams": [
+                            "T1",
+                            "T2"
+                        ],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "left",
+                                "default": "nothing",
+                                "name": "left",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "typeParam": "T1"
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "right",
+                                "default": "nothing",
+                                "name": "right",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "typeParam": "T2"
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Either",
+                "version": "nothing"
+            },
+            "Set": {
+                "annotations": [],
+                "type_": {
+                    "newtype_": {
+                        "typeParams": [
+                            "T"
+                        ],
+                        "default": "nothing",
+                        "typeExpr": {
+                            "typeRef": {
+                                "primitive": "Vector"
+                            },
+                            "parameters": [
+                                {
+                                    "typeRef": {
+                                        "typeParam": "T"
+                                    },
+                                    "parameters": []
+                                }
+                            ]
+                        }
+                    }
+                },
+                "name": "Set",
+                "version": "nothing"
+            },
+            "Maybe": {
+                "annotations": [],
+                "type_": {
+                    "union_": {
+                        "typeParams": [
+                            "T"
+                        ],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "nothing",
+                                "default": "nothing",
+                                "name": "nothing",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "Void"
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "just",
+                                "default": "nothing",
+                                "name": "just",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "typeParam": "T"
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Maybe",
+                "version": "nothing"
+            },
+            "MapEntry": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [
+                            "K",
+                            "V"
+                        ],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "k",
+                                "default": "nothing",
+                                "name": "key",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "typeParam": "K"
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "v",
+                                "default": "nothing",
+                                "name": "value",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "typeParam": "V"
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "MapEntry",
+                "version": "nothing"
+            },
+            "Result": {
+                "annotations": [],
+                "type_": {
+                    "union_": {
+                        "typeParams": [
+                            "T",
+                            "E"
+                        ],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "ok",
+                                "default": "nothing",
+                                "name": "ok",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "typeParam": "T"
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "error",
+                                "default": "nothing",
+                                "name": "error",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "typeParam": "E"
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Result",
+                "version": "nothing"
+            },
+            "Map": {
+                "annotations": [],
+                "type_": {
+                    "newtype_": {
+                        "typeParams": [
+                            "K",
+                            "V"
+                        ],
+                        "default": "nothing",
+                        "typeExpr": {
+                            "typeRef": {
+                                "primitive": "Vector"
+                            },
+                            "parameters": [
+                                {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.types",
+                                            "name": "MapEntry"
+                                        }
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "typeParam": "K"
+                                            },
+                                            "parameters": []
+                                        },
+                                        {
+                                            "typeRef": {
+                                                "typeParam": "V"
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                },
+                "name": "Map",
+                "version": "nothing"
+            },
+            "Pair": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [
+                            "T1",
+                            "T2"
+                        ],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "v1",
+                                "default": "nothing",
+                                "name": "v1",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "typeParam": "T1"
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "v2",
+                                "default": "nothing",
+                                "name": "v2",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "typeParam": "T2"
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Pair",
+                "version": "nothing"
+            }
+        }
+    },
+    "sys.adlast": {
+        "annotations": [],
+        "imports": [
+            {
+                "moduleName": "sys.annotations"
+            },
+            {
+                "moduleName": "sys.types"
+            }
+        ],
+        "name": "sys.adlast",
+        "decls": {
+            "NewType": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "typeParams",
+                                "default": "nothing",
+                                "name": "typeParams",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "Vector"
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "reference": {
+                                                    "moduleName": "sys.adlast",
+                                                    "name": "Ident"
+                                                }
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "typeExpr",
+                                "default": "nothing",
+                                "name": "typeExpr",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "TypeExpr"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "default",
+                                "default": "nothing",
+                                "name": "default",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.types",
+                                            "name": "Maybe"
+                                        }
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "primitive": "Json"
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "NewType",
+                "version": "nothing"
+            },
+            "Annotations": {
+                "annotations": [],
+                "type_": {
+                    "type_": {
+                        "typeParams": [],
+                        "typeExpr": {
+                            "typeRef": {
+                                "reference": {
+                                    "moduleName": "sys.types",
+                                    "name": "Map"
+                                }
+                            },
+                            "parameters": [
+                                {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "ScopedName"
+                                        }
+                                    },
+                                    "parameters": []
+                                },
+                                {
+                                    "typeRef": {
+                                        "primitive": "Json"
+                                    },
+                                    "parameters": []
+                                }
+                            ]
+                        }
+                    }
+                },
+                "name": "Annotations",
+                "version": "nothing"
+            },
+            "TypeDef": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "typeParams",
+                                "default": "nothing",
+                                "name": "typeParams",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "Vector"
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "reference": {
+                                                    "moduleName": "sys.adlast",
+                                                    "name": "Ident"
+                                                }
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "typeExpr",
+                                "default": "nothing",
+                                "name": "typeExpr",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "TypeExpr"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "TypeDef",
+                "version": "nothing"
+            },
+            "DeclVersions": {
+                "annotations": [],
+                "type_": {
+                    "type_": {
+                        "typeParams": [],
+                        "typeExpr": {
+                            "typeRef": {
+                                "primitive": "Vector"
+                            },
+                            "parameters": [
+                                {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Decl"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            ]
+                        }
+                    }
+                },
+                "name": "DeclVersions",
+                "version": "nothing"
+            },
+            "Struct": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "typeParams",
+                                "default": "nothing",
+                                "name": "typeParams",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "Vector"
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "reference": {
+                                                    "moduleName": "sys.adlast",
+                                                    "name": "Ident"
+                                                }
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "fields",
+                                "default": "nothing",
+                                "name": "fields",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "Vector"
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "reference": {
+                                                    "moduleName": "sys.adlast",
+                                                    "name": "Field"
+                                                }
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Struct",
+                "version": "nothing"
+            },
+            "Field": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "name",
+                                "default": "nothing",
+                                "name": "name",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Ident"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "serializedName",
+                                "default": "nothing",
+                                "name": "serializedName",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Ident"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "typeExpr",
+                                "default": "nothing",
+                                "name": "typeExpr",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "TypeExpr"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "default",
+                                "default": "nothing",
+                                "name": "default",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.types",
+                                            "name": "Maybe"
+                                        }
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "primitive": "Json"
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "annotations",
+                                "default": "nothing",
+                                "name": "annotations",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Annotations"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Field",
+                "version": "nothing"
+            },
+            "List": {
+                "annotations": [],
+                "type_": {
+                    "type_": {
+                        "typeParams": [
+                            "T"
+                        ],
+                        "typeExpr": {
+                            "typeRef": {
+                                "primitive": "Vector"
+                            },
+                            "parameters": [
+                                {
+                                    "typeRef": {
+                                        "typeParam": "T"
+                                    },
+                                    "parameters": []
+                                }
+                            ]
+                        }
+                    }
+                },
+                "name": "List",
+                "version": "nothing"
+            },
+            "ModuleName": {
+                "annotations": [],
+                "type_": {
+                    "type_": {
+                        "typeParams": [],
+                        "typeExpr": {
+                            "typeRef": {
+                                "primitive": "String"
+                            },
+                            "parameters": []
+                        }
+                    }
+                },
+                "name": "ModuleName",
+                "version": "nothing"
+            },
+            "ScopedDecl": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "moduleName",
+                                "default": "nothing",
+                                "name": "moduleName",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "ModuleName"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "decl",
+                                "default": "nothing",
+                                "name": "decl",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Decl"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "ScopedDecl",
+                "version": "nothing"
+            },
+            "Union": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "typeParams",
+                                "default": "nothing",
+                                "name": "typeParams",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "Vector"
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "reference": {
+                                                    "moduleName": "sys.adlast",
+                                                    "name": "Ident"
+                                                }
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "fields",
+                                "default": "nothing",
+                                "name": "fields",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "Vector"
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "reference": {
+                                                    "moduleName": "sys.adlast",
+                                                    "name": "Field"
+                                                }
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Union",
+                "version": "nothing"
+            },
+            "DeclType": {
+                "annotations": [],
+                "type_": {
+                    "union_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "struct_",
+                                "default": "nothing",
+                                "name": "struct_",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Struct"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "union_",
+                                "default": "nothing",
+                                "name": "union_",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Union"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "type_",
+                                "default": "nothing",
+                                "name": "type_",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "TypeDef"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "newtype_",
+                                "default": "nothing",
+                                "name": "newtype_",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "NewType"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "DeclType",
+                "version": "nothing"
+            },
+            "ATypeExpr": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [
+                            "T"
+                        ],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "Value",
+                                "default": "nothing",
+                                "name": "Value",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "TypeExpr"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "ATypeExpr",
+                "version": "nothing"
+            },
+            "TypeRef": {
+                "annotations": [],
+                "type_": {
+                    "union_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "primitive",
+                                "default": "nothing",
+                                "name": "primitive",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Ident"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "typeParam",
+                                "default": "nothing",
+                                "name": "typeParam",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Ident"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "reference",
+                                "default": "nothing",
+                                "name": "reference",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "ScopedName"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "TypeRef",
+                "version": "nothing"
+            },
+            "TypeExpr": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "typeRef",
+                                "default": "nothing",
+                                "name": "typeRef",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "TypeRef"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "parameters",
+                                "default": "nothing",
+                                "name": "parameters",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "Vector"
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "reference": {
+                                                    "moduleName": "sys.adlast",
+                                                    "name": "TypeExpr"
+                                                }
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "TypeExpr",
+                "version": "nothing"
+            },
+            "Module": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "name",
+                                "default": "nothing",
+                                "name": "name",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "ModuleName"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "imports",
+                                "default": "nothing",
+                                "name": "imports",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "Vector"
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "reference": {
+                                                    "moduleName": "sys.adlast",
+                                                    "name": "Import"
+                                                }
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "decls",
+                                "default": "nothing",
+                                "name": "decls",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "StringMap"
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "reference": {
+                                                    "moduleName": "sys.adlast",
+                                                    "name": "Decl"
+                                                }
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "annotations",
+                                "default": "nothing",
+                                "name": "annotations",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Annotations"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Module",
+                "version": "nothing"
+            },
+            "Ident": {
+                "annotations": [],
+                "type_": {
+                    "type_": {
+                        "typeParams": [],
+                        "typeExpr": {
+                            "typeRef": {
+                                "primitive": "String"
+                            },
+                            "parameters": []
+                        }
+                    }
+                },
+                "name": "Ident",
+                "version": "nothing"
+            },
+            "Import": {
+                "annotations": [],
+                "type_": {
+                    "union_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "moduleName",
+                                "default": "nothing",
+                                "name": "moduleName",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "ModuleName"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "scopedName",
+                                "default": "nothing",
+                                "name": "scopedName",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "ScopedName"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Import",
+                "version": "nothing"
+            },
+            "Decl": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "name",
+                                "default": "nothing",
+                                "name": "name",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Ident"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "version",
+                                "default": "nothing",
+                                "name": "version",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.types",
+                                            "name": "Maybe"
+                                        }
+                                    },
+                                    "parameters": [
+                                        {
+                                            "typeRef": {
+                                                "primitive": "Word32"
+                                            },
+                                            "parameters": []
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "type_",
+                                "default": "nothing",
+                                "name": "type_",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "DeclType"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "annotations",
+                                "default": "nothing",
+                                "name": "annotations",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Annotations"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "Decl",
+                "version": "nothing"
+            },
+            "ScopedName": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "moduleName",
+                                "default": "nothing",
+                                "name": "moduleName",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "ModuleName"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            },
+                            {
+                                "annotations": [],
+                                "serializedName": "name",
+                                "default": "nothing",
+                                "name": "name",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "reference": {
+                                            "moduleName": "sys.adlast",
+                                            "name": "Ident"
+                                        }
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "ScopedName",
+                "version": "nothing"
+            }
+        }
+    },
+    "sys.annotations": {
+        "annotations": [],
+        "imports": [],
+        "name": "sys.annotations",
+        "decls": {
+            "SerializedName": {
+                "annotations": [],
+                "type_": {
+                    "type_": {
+                        "typeParams": [],
+                        "typeExpr": {
+                            "typeRef": {
+                                "primitive": "String"
+                            },
+                            "parameters": []
+                        }
+                    }
+                },
+                "name": "SerializedName",
+                "version": "nothing"
+            },
+            "SerializedWithInternalTag": {
+                "annotations": [],
+                "type_": {
+                    "struct_": {
+                        "typeParams": [],
+                        "fields": [
+                            {
+                                "annotations": [],
+                                "serializedName": "tag",
+                                "default": "nothing",
+                                "name": "tag",
+                                "typeExpr": {
+                                    "typeRef": {
+                                        "primitive": "String"
+                                    },
+                                    "parameters": []
+                                }
+                            }
+                        ]
+                    }
+                },
+                "name": "SerializedWithInternalTag",
+                "version": "nothing"
+            },
+            "Doc": {
+                "annotations": [],
+                "type_": {
+                    "type_": {
+                        "typeParams": [],
+                        "typeExpr": {
+                            "typeRef": {
+                                "primitive": "String"
+                            },
+                            "parameters": []
+                        }
+                    }
+                },
+                "name": "Doc",
+                "version": "nothing"
+            },
+            "CustomSerialization": {
+                "annotations": [],
+                "type_": {
+                    "type_": {
+                        "typeParams": [],
+                        "typeExpr": {
+                            "typeRef": {
+                                "primitive": "Bool"
+                            },
+                            "parameters": []
+                        }
+                    }
+                },
+                "name": "CustomSerialization",
+                "version": "nothing"
+            }
+        }
+    }
+}

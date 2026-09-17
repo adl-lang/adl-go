@@ -1,0 +1,32 @@
+{
+  "Loader": {
+    "Searchdir": [
+      "adl"
+    ],
+    "MergeAdlext": "adl-go",
+    "BundleMaps": [
+      {
+        "AdlModuleNamePrefix": "sys",
+        "GoModPath": "github.com/adl-lang/adl-go/adl",
+        "AdlSrc": "file://../goadlc/adl/stdlib_go"
+      },
+      {
+        "AdlModuleNamePrefix": "common",
+        "GoModPath": "github.com/adl-lang/adl-go/adl",
+        "AdlSrc": "https://github.com/adl-lang/adl-common/archive/refs/tags/v1.0.0.zip"
+      }
+    ],
+    "Files": [
+      "adl/exer03/*.adl"
+    ]
+  },
+  "Mod": {
+    "Outputdir": "."
+  },
+  "GoTypes": {
+    "NoGoFmt": false,
+    "GoAdlPath": "github.com/adl-lang/adl-go/adl",
+    "ExcludeAst": false,
+    "Outputdir": "."
+  }
+}
