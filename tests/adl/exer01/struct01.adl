@@ -1,0 +1,21 @@
+module exer01.struct01 {
+
+struct Struct01 {
+    Void A;
+    Int64 B;
+    String C;
+    Json d;
+    Vector<String> e;
+    StringMap<Vector<String>> f; // map[string][]string
+    StringMap<StringMap<String>> g; // map[string]map[string]string
+    StringMap<StringMap<Nullable<String>>> h; // map[string][]*string
+    Nullable<String> i;
+    B j;
+};
+
+struct B {
+    String a;
+};
+
+
+};

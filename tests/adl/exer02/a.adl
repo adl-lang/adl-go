@@ -1,0 +1,10 @@
+module exer02.a {
+
+import exer02.b.*;
+
+struct A {
+    B a;// = {"a": "exer02.a.A::a"};
+    exer02.another.b.B b;// = {"a": "ddd"};
+};
+
+};

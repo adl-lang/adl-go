@@ -1,0 +1,23 @@
+module exer01.simple_union {
+
+union UnionOfPrimitives {
+    Int32 A;
+    Int64 B;
+    Bool  c;
+    Double d;
+    String e;
+    Vector<String> f;
+    Void g;
+};
+
+union UnionOfVoids {
+    Void A;
+    Void B;
+    Void c;
+    Void d;
+    Void e;
+    Void f;
+    Void g;
+};
+
+};

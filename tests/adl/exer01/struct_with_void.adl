@@ -1,0 +1,14 @@
+module exer01.struct_with_void {
+
+struct StructOf {
+    Void A;
+};
+
+struct StructB<X> {
+    Void B;
+};
+
+type StructC = StructOf;
+
+
+};

@@ -1,0 +1,62 @@
+module talk.choice01 {
+
+type Page = String;
+
+newtype LangGen = CodeGen<Language>;
+
+struct CodeGen<L> {
+    L language;
+    CodeGenTechnique technique;
+};
+
+@Page "Introduction to ADL"
+union ChoiceOne {
+    Sumtype pattern;
+    Vector<String> bootstrapping;
+    LangGen codeGen = {"language": "go_", "technique": "templates"};
+};
+
+struct Step {
+    String description = "Hello World!";
+};
+
+
+// type MyString<T> = String;
+
+
+// struct MyStruct {
+//     sys.types.Map<Vector<String>,Int64> a;
+// };
+
+union Language {
+    Void go_;
+    Void ts;
+    Void java;
+    Void haskell;
+    Void rust;
+    Void cpp;
+};
+
+union CodeGenTechnique {
+    Void printf;
+    Void templates;
+};
+
+union Sumtype {
+    Void struct_of_pointers;
+    Void disc_and_any;
+    Void interface_with_private_method;
+    ExhaustiveSwitch<Sumtype> type_safe;
+};
+
+struct ExhaustiveSwitch<T> {
+    Sumtype sum_type;
+    TypeSafe impl;
+};
+
+union TypeSafe {
+    Void callback;
+};
+
+
+};

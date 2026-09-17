@@ -1,0 +1,27 @@
+module exer04.struct_of_structs_with_defaults {
+
+struct StructOfStruct {
+    Foo A;// = { "d" : 1 };
+    Bar B;// = { "d" : "hw" };
+    Fizz c;// = { "A":{ "d" : 2 }, "B": { "d": "bb"}, "c": "nothing"};
+};
+
+struct Foo {
+    Int32 d = 1;
+};
+
+struct Bar {
+    String d = "doe a deer";
+    StringMap<Vector<Bool>> svb = {"a": [true,false], "b": [false,true]};
+};
+
+
+struct Fizz {
+    Foo A;
+    Bar B;
+    // sys.types.Maybe<Fizz> c;
+};
+
+newtype NT = StructOfStruct;// = { "A": {"d": 2}, "B": {"d": "a female deer"}};
+
+};

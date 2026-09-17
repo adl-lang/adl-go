@@ -1,0 +1,24 @@
+{
+  "Loader": {
+    "Searchdir": [
+      "adl/exer"
+    ],
+    "BundleMaps": [
+      {
+        "AdlModuleNamePrefix": "sys",
+        "GoModPath": "github.com/adl-lang/adl-go/adl",
+        "AdlSrc": "file://../goadlc/adl/stdlib_go"
+      }
+    ],
+    "Files": [
+      "adl/exer02/simple_struct.adl"
+    ]
+  },
+  "Mod": {
+    "Outputdir": "out"
+  },
+  "GoTypes": {
+    "GoAdlPath": "github.com/adl-lang/adl-go/adl",
+    "Outputdir": "out"
+  }
+}

@@ -1,0 +1,49 @@
+module exer06.tttest {
+
+struct S1<A> {
+    TypeToken<A> a = null;
+    Json b = {"a": null};
+};
+
+union U1<A> {
+    TypeToken<A> a;
+    String b;
+    Void c;
+};
+
+struct S4<A> {
+    S1<S4<A>> z;
+    A a;
+};
+
+struct S5<A,B> {
+    TypeToken<A> a = null;
+    TypeToken<B> b = null;
+};
+
+struct S2<A> {
+    S1<String> a;
+    S1<S3> b;
+    S1<Vector<S3>> c;
+};
+
+struct S3 {
+    TypeToken<String> a;
+};
+
+type T1 = S1<String>;
+
+newtype X<A> = S1<A>;
+type Xt<A> = S1<S4<A>>;
+
+struct Y {
+    Xt<String> a;
+};
+
+struct Z {
+    S1<String> a = {};
+    X<Int64> b = {};
+    S5<String,Int64> c = {};
+};
+
+};

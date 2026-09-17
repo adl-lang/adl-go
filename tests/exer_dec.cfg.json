@@ -1,0 +1,31 @@
+{
+  "Searchdir": [
+    "adl/stdlib@1.2",
+    "adl/exer"
+  ],
+  "Outputdir": "out",
+  "MergeAdlext": "adl-go",
+  "Debug": true,
+  "NoGoFmt": false,
+  "GoAdlPath": "github.com/adl-lang/adl-go/adl",
+  "ModulePath": "",
+  "GoModFile": "",
+  "ExcludeAst": false,
+  "ModuleMap": [
+    {
+      "ModuleName": "sys.adlast",
+      "Name": "adlast",
+      "Path": "github.com/adl-lang/adl-go/adl/sys/adlast"
+    },
+    {
+      "ModuleName": "sys.types",
+      "Name": "types",
+      "Path": "github.com/adl-lang/adl-go/adl/sys/types"
+    }
+  ],
+  "GenAstInfo": [],
+  "StdLibGen": false,
+  "Files": [
+    "adl/exer/decode/*.adl"
+  ]
+}

@@ -1,0 +1,22 @@
+module cyoa {
+
+union Page<A,B,C> {
+    Void next_page;
+    ChoiceTwo<A,B> two;
+    ChoiceThree<A,B,C> tri;
+};
+
+union ChoiceTwo<A,B> {
+    A one;
+    B two;
+};
+
+union ChoiceThree<A,B,C> {
+    A one;
+    B two;
+    C tri;
+};
+
+
+
+};

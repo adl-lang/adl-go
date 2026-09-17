@@ -1,0 +1,101 @@
+module decode.test01 {
+
+newtype A = Int64;
+
+@A 123
+struct B {
+    Int64 a;
+};
+
+struct C {
+    B b = {"a": 1234};
+    B c;
+};
+
+union D {
+    Int64 a;
+    B b;
+};
+
+struct E {
+    D d;
+};
+
+struct F {
+    Int8 a;
+    Int16 b;
+    Int32 c;
+    Int64 d;
+    Word8 e;
+    Word16 f;
+    Word32 g;
+    Word64 h;
+    Bool i;
+    Float j;
+    Double k;
+    String l;
+    // ByteVector m;
+    Json n;
+    Vector<Int64> o;
+    StringMap<Int64> p;
+    Nullable<Int64> q;
+    Void r;
+};
+
+struct G {
+    Vector<G> a;
+};
+
+struct Unit {};
+
+struct Int {
+    Int8 a;
+};
+
+struct Uint {
+    Word16 a;
+};
+
+struct Bool {
+    Bool a;
+};
+
+struct NullableString {
+    Nullable<String> a;
+};
+
+struct StringMapString {
+    StringMap<String> a;
+};
+
+struct VectorString {
+    Vector<String> a;
+};
+
+struct Json {
+    Json a;
+};
+
+struct SetTest {
+    sys.types.Set<String> my_set = ["a","b","z"];
+};
+
+struct MapTest {
+    sys.types.Map<String,Int64> my_set = [{"k":"a","v":1}];
+};
+
+struct HasDefault {
+    String a = "1234567890";
+};
+
+struct NoDefault {
+    String a;
+};
+
+newtype MyV<A> = Vector<A>;
+
+struct GenericF<AA> {
+    AA a;
+};
+
+};
