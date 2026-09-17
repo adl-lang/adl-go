@@ -1,0 +1,13 @@
+{{$G := .G}}
+{{$name := .Name | .G.GoEscape | public}}
+func AST_{{$name}}() {{$G.GoImport "adlast"}}ScopedDecl {
+	decl := {{$G.GoDeclValue .Decl}}
+	return {{$G.GoImport "adlast"}}Make_ScopedDecl("{{.ModuleName}}", decl)
+}
+
+func init() {
+	{{$G.GoImport "goadl"}}RESOLVER.Register(
+		{{$G.GoImport "adlast"}}Make_ScopedName("{{.ModuleName}}", "{{.Name}}"),
+		AST_{{.Name}}(),
+	)
+	{{$G.GoRegisterHelper .ModuleName .Decl}}}

@@ -1,0 +1,26 @@
+module cli.gotypes {
+
+import cli.root.Root;
+import cli.loader.LoadResult;
+import cli.gomod.GoModResult;
+
+struct GoTypes {
+    @SerializedName "-"
+    Nullable<Root> Root = null;
+    @SerializedName "-"
+    Nullable<LoadResult> loader = null;
+    @SerializedName "-"
+    Nullable<GoModResult> goMod = null;
+    /// Don't run 'go fmt' on the generated files
+    Bool NoGoFmt = false;
+    /// The path to the Go ADL runtime import
+    String GoAdlPath = "github.com/adl-lang/adl-go/adl";
+    /// Don't generate type expr, scoped decl and init registration functions
+    Bool ExcludeAst = false;
+    /// Used for bootstrapping, only use when generating the sys.aldast & sys.types modules
+    Bool StdLibGen = false;
+    /// output dir
+    String Outputdir;
+};
+
+};

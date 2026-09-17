@@ -1,0 +1,53 @@
+{{$decl := .}}
+{{$name := .Name | public}}
+{{$G := .G}}
+type {{$name}}{{$decl.TypeParams.LSide}} struct {
+	_{{$name}}{{$decl.TypeParams.RSide}}
+}
+
+type _{{$name}}{{$decl.TypeParams.LSide}} struct {
+{{range .Fields}}	{{.Name|public}} {{$G.GoType .TypeExpr .Annotations}} `json:"{{.SerializedName}}"`
+{{end -}}
+}
+
+func MakeAll_{{$name}}{{.TypeParams.LSide}}(
+{{range .Fields}}{{if not .IsVoid}}	{{.Name | lower | .G.GoEscape}} {{$G.GoType .TypeExpr .Annotations}},
+{{end}}{{end -}}
+) {{$name}}{{.TypeParams.RSide}} {
+	return {{$name}}{{.TypeParams.RSide}}{
+		_{{$name}}{{.TypeParams.RSide}}{
+{{range .Fields}}
+{{- if .IsVoid -}}
+{{$type := $G.GoType .TypeExpr .Annotations}}			{{.Name | public}}: struct{}{},
+{{- else -}}
+{{$type := $G.GoType .TypeExpr .Annotations}}			{{.Name | public}}: {{.Name | lower | .G.GoEscape}},
+{{- end}}
+{{end}}	},
+		}
+}
+
+{{if .ContainsTypeToken}}
+// struct {{$name}} contains at least one TypeToken, not generating Make_ funcs
+{{else}}
+func Make_{{$name}}{{.TypeParams.LSide}}(
+{{range .Fields}}{{if not .IsVoid}}{{if not .HasDefault}}	{{.Name | lower | .G.GoEscape}} {{$G.GoType .TypeExpr .Annotations}},
+{{end}}{{end}}{{end -}}
+) {{$name}}{{.TypeParams.RSide}} {
+	ret := {{$name}}{{.TypeParams.RSide}}{
+		_{{$name}}{{.TypeParams.RSide}}{
+{{range .Fields}}{{$type := $G.GoType .TypeExpr .Annotations}} {{if not .IsVoid}} {{if not .HasDefault}}		{{.Name | public}}: {{.Name | lower | .G.GoEscape}},
+{{else}}		{{.Name | public}}: ((*{{$name}}{{$decl.TypeParams.RSide}})(nil)).Default_{{.Name}}(),
+{{end}}
+{{- else -}}
+		{{.Name | public}}: struct{}{},
+{{end}}
+{{- end}}	},
+		}
+	return ret
+}
+
+{{range .Fields}}{{$type := $G.GoType .TypeExpr .Annotations}}{{if .HasDefault}}func (*{{$decl.Name}}{{$decl.TypeParams.RSide}}) Default_{{.Name | $G.GoEscape}}() {{$type}} {
+	return {{$G.GoValue .Annotations .TypeExpr .Just}}
+}
+{{end}}{{end}}
+{{end}}

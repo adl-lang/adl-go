@@ -1,0 +1,19 @@
+module cli.goapi {
+
+import cli.root.Root;
+import cli.loader.LoadResult;
+import cli.gomod.GoModResult;
+
+struct GoApi {
+    @SerializedName "-"
+    Nullable<Root> root = null;
+    @SerializedName "-"
+    Nullable<LoadResult> loader = null;
+    @SerializedName "-"
+    Nullable<GoModResult> goMod = null;
+    sys.adlast.ScopedName ApiStruct;
+    String Outputdir;
+    String GoAdlCommonImport;
+};
+
+};

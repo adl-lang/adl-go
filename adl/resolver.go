@@ -1,4 +1,4 @@
-package goadl
+package adl
 
 import (
 	"github.com/adl-lang/adl-go/adl/adljson"

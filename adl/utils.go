@@ -1,4 +1,4 @@
-package goadl
+package adl
 
 import (
 	"fmt"

@@ -1,0 +1,44 @@
+module adlc.config.go_ {
+
+/// ADL declaration annotation to specify the custom type to use
+struct GoCustomType
+{
+    /// The Go struct to use
+    ///
+    /// Note currently interfaces are not supported
+    GoType gotype;
+
+    /// The Go structed which implements json Marshal and Unmarshal for the gotype.
+    ///
+    /// Note Marshal and Unmarshal must be implemented for the specified struct's nil ptr
+    GoHelperType helpers;
+
+    // // If true, we still generate the standard ADL derived
+    // // class (even though no generated code will refer to it)
+    // Bool generateType = false;
+};
+
+struct GoType {
+    String name;
+    String pkg;
+    /// list of type constraints e.g. for Map this would be [comparable, any]
+    Vector<String> type_constraints;
+    String import_path;
+};
+
+struct GoHelperType {
+    String name;
+    /// use null if helper is in the same go package as the generated decl
+    Nullable<GoPkg> ref = null;
+};
+
+struct GoPkg {
+    String pkg;
+    String import_path;
+};
+
+// This is an internal type used by the code generator to propogate GoType::type_constraints.
+// During code gen decls, fields and braches are annotated to match type_constraints specified on custom types.
+type TypeParamConstraintList = Vector<String>;
+
+};

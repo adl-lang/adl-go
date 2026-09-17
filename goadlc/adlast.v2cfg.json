@@ -1,0 +1,24 @@
+{
+  "Loader": {
+    "Searchdir": [
+      "adl/stdlib_go"
+    ],
+    "MergeAdlext": "adl-go",
+    "Files": [
+      ".local/lib/adl/sys/**/*.adl",
+      ".local/lib/adl/adlc/**/*.adl",
+      "adl/stdlib_go/**/*.adl"
+    ]
+  },
+  "Mod": {
+    "Outputdir": "../goadl_rt/v3"
+  },
+  "GoTypes": {
+    "NoGoFmt": false,
+    "GoAdlPath": "github.com/adl-lang/adl-go/adl",
+    "ExcludeAst": false,
+    "StdLibGen": true,
+    "Outputdir": "../goadl_rt/v3"
+  },
+  "GoApis": null
+}

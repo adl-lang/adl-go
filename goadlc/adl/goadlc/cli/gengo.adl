@@ -1,0 +1,22 @@
+module cli.gengo {
+
+import cli.root.Root;
+import cli.loader.Loader;
+import cli.gotypes.GoTypes;
+import cli.goapi.GoApi;
+import cli.gomod.GoModule;
+
+struct GenGo {
+    @SerializedName "-"
+    Nullable<Root> root = null;
+    // @SerializedName "-"
+    Nullable<Loader> Loader;// = null;
+    /// Used to find the go.mod file and calculate the codes module-path and sub-dir of generated code
+    Nullable<GoModule> Mod;
+    /// The directory to change to after root read cfg but before running (used in dev)"
+    String ChangePWD = "";
+    Nullable<GoTypes> GoTypes;
+    Nullable<Vector<GoApi>> GoApis = null;
+};
+
+};
