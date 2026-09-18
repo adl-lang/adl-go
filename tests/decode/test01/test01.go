@@ -4,7 +4,7 @@ package test01
 import (
 	"fmt"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/adljson"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"

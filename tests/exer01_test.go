@@ -9,7 +9,7 @@ import (
 	"adl_testing/exer01/simple_union"
 	"adl_testing/exer01/struct01"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 )
 

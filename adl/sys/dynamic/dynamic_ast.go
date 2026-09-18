@@ -2,7 +2,7 @@
 package dynamic
 
 import (
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"

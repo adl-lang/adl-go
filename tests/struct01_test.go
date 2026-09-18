@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"testing"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 )
 
 func TestXxx(t *testing.T) {

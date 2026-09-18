@@ -9,7 +9,7 @@ import (
 	"os"
 	"text/template"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gengo"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goapi"

@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"golang.org/x/mod/modfile"
 )
 

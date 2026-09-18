@@ -9,7 +9,7 @@ import (
 
 	"adl_testing/diff"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/davecgh/go-spew/spew"
 )

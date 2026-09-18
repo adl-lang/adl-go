@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/samber/lo"
 )

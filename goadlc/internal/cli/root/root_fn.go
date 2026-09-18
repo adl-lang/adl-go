@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 )
 

@@ -8,7 +8,7 @@ import (
 
 	"adl_testing/diff"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 )
 
 func TestTypeTokenEncode(t *testing.T) {

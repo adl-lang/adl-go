@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 )

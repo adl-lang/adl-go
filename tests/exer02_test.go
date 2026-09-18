@@ -8,7 +8,7 @@ import (
 	b2 "adl_testing/exer02/another/b"
 	"adl_testing/exer02/b"
 
-	adl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 )
 
 func TestExec02Encode(t *testing.T) {
