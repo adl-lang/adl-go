@@ -2,7 +2,7 @@
 package choice01
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -86,7 +86,7 @@ func AST_ChoiceOne() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "ChoiceOne"),
 		AST_ChoiceOne(),
 	)
@@ -148,7 +148,7 @@ func AST_CodeGen() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "CodeGen"),
 		AST_CodeGen(),
 	)
@@ -205,7 +205,7 @@ func AST_CodeGenTechnique() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "CodeGenTechnique"),
 		AST_CodeGenTechnique(),
 	)
@@ -270,7 +270,7 @@ func AST_ExhaustiveSwitch() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "ExhaustiveSwitch"),
 		AST_ExhaustiveSwitch(),
 	)
@@ -321,7 +321,7 @@ func AST_LangGen() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "LangGen"),
 		AST_LangGen(),
 	)
@@ -426,7 +426,7 @@ func AST_Language() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "Language"),
 		AST_Language(),
 	)
@@ -463,7 +463,7 @@ func AST_Page() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "Page"),
 		AST_Page(),
 	)
@@ -510,7 +510,7 @@ func AST_Step() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "Step"),
 		AST_Step(),
 	)
@@ -604,7 +604,7 @@ func AST_Sumtype() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "Sumtype"),
 		AST_Sumtype(),
 	)
@@ -649,7 +649,7 @@ func AST_TypeSafe() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("talk.choice01", "TypeSafe"),
 		AST_TypeSafe(),
 	)

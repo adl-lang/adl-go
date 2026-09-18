@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 )
 
@@ -28,7 +28,7 @@ func Config[A any](
 			cwd, _ := os.Getwd()
 			return fmt.Errorf("error opening file cwd:%s cfg:%s err:%v", cwd, rt.Cfg, err)
 		}
-		dec := goadl.CreateJsonDecodeBinding(te, goadl.RESOLVER)
+		dec := adl.CreateJsonDecodeBinding(te, adl.RESOLVER)
 		err = dec.Decode(fd, in)
 		if err != nil {
 			return err
@@ -36,7 +36,7 @@ func Config[A any](
 		}
 	}
 	if rt.DumpConfig {
-		enc := goadl.CreateJsonEncodeBinding(te, goadl.RESOLVER)
+		enc := adl.CreateJsonEncodeBinding(te, adl.RESOLVER)
 		buf := bytes.Buffer{}
 		err := enc.Encode(&buf, *in)
 		if err != nil {
@@ -58,7 +58,7 @@ func DumpConfig[A any](
 	te adlast.ATypeExpr[A],
 	in A,
 ) error {
-	enc := goadl.CreateJsonEncodeBinding(te, goadl.RESOLVER)
+	enc := adl.CreateJsonEncodeBinding(te, adl.RESOLVER)
 	buf := bytes.Buffer{}
 	err := enc.Encode(&buf, in)
 	if err != nil {
@@ -87,7 +87,7 @@ func ReadConfig[A any](
 		cwd, _ := os.Getwd()
 		return fmt.Errorf("error opening file cwd:%s cfg:%s err:%v", cwd, rt.Cfg, err)
 	}
-	dec := goadl.CreateJsonDecodeBinding(te, goadl.RESOLVER)
+	dec := adl.CreateJsonDecodeBinding(te, adl.RESOLVER)
 	err = dec.Decode(fd, in)
 	if err != nil {
 		return err

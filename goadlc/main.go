@@ -9,7 +9,7 @@ import (
 	"os"
 	"text/template"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gengo"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goapi"
@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	rt := goadl.Addr(root.Make_Root())
+	rt := adl.Addr(root.Make_Root())
 	ld := &loader.Loader{}
 	gm := gomod.Make_GoModule_GoModFile("")
 	// gm := &gomod.GoModule{}
@@ -120,8 +120,8 @@ func dump_exmaple() {
 	)
 	gen := gengo.Make_GenGo(
 		&ld,
-		goadl.Addr(gomod.Make_GoModule_Outputdir(".")),
-		goadl.Addr(gotypes.Make_GoTypes(
+		adl.Addr(gomod.Make_GoModule_Outputdir(".")),
+		adl.Addr(gotypes.Make_GoTypes(
 			// &rt,
 			// &ld,
 			".",
@@ -129,7 +129,7 @@ func dump_exmaple() {
 	)
 	gen.GoApis = &[]goapi.GoApi{{}}
 
-	je := goadl.CreateJsonEncodeBinding(gengo.Texpr_GenGo(), goadl.RESOLVER)
+	je := adl.CreateJsonEncodeBinding(gengo.Texpr_GenGo(), adl.RESOLVER)
 	buf := bytes.Buffer{}
 	err := je.Encode(&buf, gen)
 	if err != nil {

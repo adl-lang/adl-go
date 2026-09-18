@@ -10,7 +10,7 @@ import (
 	"sort"
 	"strings"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -39,7 +39,7 @@ func (bg *Generator) GoDeclValue(val adlast.Decl) string {
 		}
 	}()
 	var buf bytes.Buffer
-	enc := goadl.CreateJsonEncodeBinding(goadl.Texpr_Decl(), goadl.RESOLVER)
+	enc := adl.CreateJsonEncodeBinding(adl.Texpr_Decl(), adl.RESOLVER)
 	err := enc.Encode(&buf, val)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "!!!! encode error %v\n", err)
@@ -60,7 +60,7 @@ func (bg *Generator) GoDeclValue(val adlast.Decl) string {
 	}
 	// TODO make it so we GoValue can take both an any and a decl
 	// or make it so the encoder can encode to an any
-	return gvg.goValue(val.Annotations, goadl.Texpr_Decl().Value, m)
+	return gvg.goValue(val.Annotations, adl.Texpr_Decl().Value, m)
 }
 
 func (bg *Generator) GoTexprValue(val adlast.TypeExpr, anns customtypes.MapMap[adlast.ScopedName, any]) string {
@@ -72,7 +72,7 @@ func (bg *Generator) GoTexprValue(val adlast.TypeExpr, anns customtypes.MapMap[a
 	// 	}
 	// }()
 	var buf bytes.Buffer
-	enc := goadl.CreateJsonEncodeBinding(goadl.Texpr_TypeExpr(), goadl.RESOLVER)
+	enc := adl.CreateJsonEncodeBinding(adl.Texpr_TypeExpr(), adl.RESOLVER)
 	err := enc.Encode(&buf, val)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "!!!! encode error %v\n", err)
@@ -90,7 +90,7 @@ func (bg *Generator) GoTexprValue(val adlast.TypeExpr, anns customtypes.MapMap[a
 	// bg.genAdlAst = true
 	// TODO make it so we GoValue can take both an any and a decl
 	// or make it so the encoder can encode to an any
-	return bg.GoValue(anns, goadl.Texpr_TypeExpr().Value, m)
+	return bg.GoValue(anns, adl.Texpr_TypeExpr().Value, m)
 }
 
 type goval_gen struct {
@@ -140,9 +140,9 @@ func (bg *goval_gen) goValue(
 			if !ok {
 				panic(fmt.Errorf("cannot resolve %v", ref))
 			}
-			tbind := goadl.CreateDecBoundTypeParams(goadl.TypeParamsFromDecl(*decl), te.Parameters)
-			if goadl.HasAnnotation(decl.Annotations, GoCustomTypeSN) {
-				monoTe, _ := goadl.SubstituteTypeBindings(tbind, te)
+			tbind := adl.CreateDecBoundTypeParams(adl.TypeParamsFromDecl(*decl), te.Parameters)
+			if adl.HasAnnotation(decl.Annotations, GoCustomTypeSN) {
+				monoTe, _ := adl.SubstituteTypeBindings(tbind, te)
 				return bg.goCustomType(decl, monoTe, gt, val)
 			}
 			bg.path = append(bg.path, decl.Name)
@@ -155,11 +155,11 @@ func (bg *goval_gen) goValue(
 					return bg.goUnion(union_, decl.Name, tbind, gt, val)
 				},
 				func(type_ adlast.TypeDef) string {
-					monoTe, _ := goadl.SubstituteTypeBindings(tbind, type_.TypeExpr)
+					monoTe, _ := adl.SubstituteTypeBindings(tbind, type_.TypeExpr)
 					return bg.goValue(decl.Annotations, monoTe, val)
 				},
 				func(newtype_ adlast.NewType) string {
-					monoTe, _ := goadl.SubstituteTypeBindings(tbind, newtype_.TypeExpr)
+					monoTe, _ := adl.SubstituteTypeBindings(tbind, newtype_.TypeExpr)
 					return fmt.Sprintf("%s(\n%s,\n)", gt, bg.goValue(decl.Annotations, monoTe, val))
 				},
 				nil,
@@ -175,8 +175,8 @@ func (bg *Generator) goCustomType(
 	gt goTypeExpr,
 	val any,
 ) string {
-	jb := goadl.CreateJsonDecodeBinding(goadl.Texpr_GoCustomType(), goadl.RESOLVER)
-	gct, err := goadl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
+	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
+	gct, err := adl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
 	if err != nil {
 		panic(err)
 	}
@@ -257,7 +257,7 @@ type custTypeConstructionParams struct {
 
 func (bg *goval_gen) goStruct(
 	struct_ adlast.Struct,
-	tbind []goadl.TypeBinding,
+	tbind []adl.TypeBinding,
 	gt goTypeExpr,
 	val any,
 ) string {
@@ -288,7 +288,7 @@ func (bg *goval_gen) goStruct(
 			return ret
 		}
 		if v, ok := mval[fld.SerializedName]; ok {
-			monoTe, _ := goadl.SubstituteTypeBindings(tbind, fld.TypeExpr)
+			monoTe, _ := adl.SubstituteTypeBindings(tbind, fld.TypeExpr)
 			fgv := bg.goValue(fld.Annotations, monoTe, v)
 			ret = append(ret, fgv)
 			// ret = append(ret, fmt.Sprintf(`%s: %s`, public(fld.Name), fgv))
@@ -300,7 +300,7 @@ func (bg *goval_gen) goStruct(
 					return nil
 				},
 				func(just any) any {
-					monoTe, _ := goadl.SubstituteTypeBindings(tbind, fld.TypeExpr)
+					monoTe, _ := adl.SubstituteTypeBindings(tbind, fld.TypeExpr)
 					var fgv string
 					if just != nil {
 						val = reflect.ValueOf(just).Interface()
@@ -330,7 +330,7 @@ func (bg *goval_gen) goStruct(
 func (bg *goval_gen) goUnion(
 	union_ adlast.Union,
 	decl_name string,
-	tbind []goadl.TypeBinding,
+	tbind []adl.TypeBinding,
 	gt goTypeExpr,
 	val any,
 ) string {
@@ -364,7 +364,7 @@ func (bg *goval_gen) goUnion(
 		panic(fmt.Errorf("unexpected branch - no type registered '%v'", k))
 	}
 	bg.path = append(bg.path, fld.Name)
-	monoTe, _ := goadl.SubstituteTypeBindings(tbind, fld.TypeExpr)
+	monoTe, _ := adl.SubstituteTypeBindings(tbind, fld.TypeExpr)
 	// f_tp := typeParam{
 	// 	ps: slices.Map[adlast.TypeExpr, string](monoTe.Parameters, func(a adlast.TypeExpr) string {
 	// 		return bg.GoType(a).Type
@@ -483,7 +483,7 @@ func (bg *goval_gen) goValuePrimitive(
 		if val == nil {
 			return "nil"
 		}
-		gl, _ := bg.Cli.GoImport("goadl", bg.ModuleName, &bg.Imports)
+		gl, _ := bg.Cli.GoImport("adl", bg.ModuleName, &bg.Imports)
 		return gl + "Addr(" + bg.goValue(anns, te.Parameters[0], val) + ")"
 	}
 	panic("Unknown GoValuePrimitive")

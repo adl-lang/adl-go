@@ -13,7 +13,7 @@ import (
 	"sort"
 	"strings"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/mattn/go-zglob"
 )
@@ -27,7 +27,7 @@ func (lr *LoadResult) Resolver(sn adlast.ScopedName) (*adlast.Decl, bool) {
 		return &decl, true
 	}
 	// resolve adlast, types & go_ even if not provided as input adl source
-	si := goadl.RESOLVER.Resolve(sn)
+	si := adl.RESOLVER.Resolve(sn)
 	if si != nil {
 		return &si.Decl, true
 	}
@@ -142,7 +142,7 @@ func loadAdl(
 	}
 
 	combinedAst := make(map[string]adlast.Module)
-	dec := goadl.CreateJsonDecodeBinding(adlast.Texpr_StringMap[adlast.Module](goadl.Texpr_Module()), goadl.RESOLVER)
+	dec := adl.CreateJsonDecodeBinding(adlast.Texpr_StringMap[adlast.Module](adl.Texpr_Module()), adl.RESOLVER)
 	err = dec.Decode(fd, &combinedAst)
 	if err != nil {
 		return nil, nil, err

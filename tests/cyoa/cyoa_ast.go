@@ -2,7 +2,7 @@
 package cyoa
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -75,7 +75,7 @@ func AST_ChoiceThree() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("cyoa", "ChoiceThree"),
 		AST_ChoiceThree(),
 	)
@@ -135,7 +135,7 @@ func AST_ChoiceTwo() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("cyoa", "ChoiceTwo"),
 		AST_ChoiceTwo(),
 	)
@@ -246,7 +246,7 @@ func AST_Page() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("cyoa", "Page"),
 		AST_Page(),
 	)

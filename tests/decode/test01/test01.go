@@ -4,7 +4,7 @@ package test01
 import (
 	"fmt"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/adljson"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
@@ -517,13 +517,13 @@ func (*MapTest) Default_my_set() customtypes.MapMap[string, int64] {
 	return adljson.Unwrap(((*customtypes.MapHelper)(nil)).Construct(
 		&customtypes.MapMap[string, int64]{},
 		[]interface{}{map[string]interface{}{"k": "a", "v": 1}},
-		goadl.CreateUncheckedJsonDecodeBinding(
+		adl.CreateUncheckedJsonDecodeBinding(
 			adlast.Make_TypeExpr(adlast.Make_TypeRef_primitive("String"), []adlast.TypeExpr{}),
-			goadl.RESOLVER,
+			adl.RESOLVER,
 		).Binder(),
-		goadl.CreateUncheckedJsonDecodeBinding(
+		adl.CreateUncheckedJsonDecodeBinding(
 			adlast.Make_TypeExpr(adlast.Make_TypeRef_primitive("Int64"), []adlast.TypeExpr{}),
-			goadl.RESOLVER,
+			adl.RESOLVER,
 		).Binder(),
 	)).(customtypes.MapMap[string, int64])
 }
@@ -619,9 +619,9 @@ func (*SetTest) Default_my_set() customtypes.MapSet[string] {
 	return adljson.Unwrap(((*customtypes.SetHelper)(nil)).Construct(
 		&customtypes.MapSet[string]{},
 		[]interface{}{"a", "b", "z"},
-		goadl.CreateUncheckedJsonDecodeBinding(
+		adl.CreateUncheckedJsonDecodeBinding(
 			adlast.Make_TypeExpr(adlast.Make_TypeRef_primitive("String"), []adlast.TypeExpr{}),
-			goadl.RESOLVER,
+			adl.RESOLVER,
 		).Binder(),
 	)).(customtypes.MapSet[string])
 }

@@ -8,14 +8,14 @@
     ]
   },
   "Mod": {
-    "Outputdir": "../goadl_rt/v3"
+    "Outputdir": "../adl"
   },
   "GoTypes": {
     "NoGoFmt": false,
     "GoAdlPath": "github.com/adl-lang/adl-go/adl",
     "ExcludeAst": false,
     "StdLibGen": true,
-    "Outputdir": "../goadl_rt/v3"
+    "Outputdir": "../adl"
   },
   "GoApis": null
 }

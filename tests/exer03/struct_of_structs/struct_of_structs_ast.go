@@ -2,7 +2,7 @@
 package struct_of_structs
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -47,7 +47,7 @@ func AST_Bar() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer03.struct_of_structs", "Bar"),
 		AST_Bar(),
 	)
@@ -132,7 +132,7 @@ func AST_Fizz() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer03.struct_of_structs", "Fizz"),
 		AST_Fizz(),
 	)
@@ -177,7 +177,7 @@ func AST_Foo() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer03.struct_of_structs", "Foo"),
 		AST_Foo(),
 	)
@@ -255,7 +255,7 @@ func AST_StructOfStruct() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer03.struct_of_structs", "StructOfStruct"),
 		AST_StructOfStruct(),
 	)

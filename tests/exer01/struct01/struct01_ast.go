@@ -2,7 +2,7 @@
 package struct01
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -47,7 +47,7 @@ func AST_B() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer01.struct01", "B"),
 		AST_B(),
 	)
@@ -266,7 +266,7 @@ func AST_Struct01() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer01.struct01", "Struct01"),
 		AST_Struct01(),
 	)

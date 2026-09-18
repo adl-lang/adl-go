@@ -2,7 +2,7 @@
 package tttest
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -72,7 +72,7 @@ func AST_S1() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "S1"),
 		AST_S1(),
 	)
@@ -186,7 +186,7 @@ func AST_S2() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "S2"),
 		AST_S2(),
 	)
@@ -238,7 +238,7 @@ func AST_S3() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "S3"),
 		AST_S3(),
 	)
@@ -317,7 +317,7 @@ func AST_S4() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "S4"),
 		AST_S4(),
 	)
@@ -395,7 +395,7 @@ func AST_S5() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "S5"),
 		AST_S5(),
 	)
@@ -442,7 +442,7 @@ func AST_T1() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "T1"),
 		AST_T1(),
 	)
@@ -520,7 +520,7 @@ func AST_U1() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "U1"),
 		AST_U1(),
 	)
@@ -570,7 +570,7 @@ func AST_X() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "X"),
 		AST_X(),
 	)
@@ -619,7 +619,7 @@ func AST_Xt() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "Xt"),
 		AST_Xt(),
 	)
@@ -674,7 +674,7 @@ func AST_Y() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "Y"),
 		AST_Y(),
 	)
@@ -785,7 +785,7 @@ func AST_Z() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer06.tttest", "Z"),
 		AST_Z(),
 	)

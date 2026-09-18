@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"testing"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 )
 
 func TestXxx(t *testing.T) {
@@ -33,7 +33,7 @@ func TestXxx(t *testing.T) {
 	// fmt.Printf("%v\n", f2.IsZero())
 
 	out := &bytes.Buffer{}
-	enc := goadl.CreateJsonEncodeBinding[struct01.Struct01](struct01.Texpr_Struct01(), goadl.RESOLVER)
+	enc := adl.CreateJsonEncodeBinding[struct01.Struct01](struct01.Texpr_Struct01(), adl.RESOLVER)
 	enc.Encode(out, x)
 	// fmt.Printf("%s\n", string(out.Bytes()))
 }

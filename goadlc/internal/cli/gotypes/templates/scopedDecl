@@ -6,7 +6,7 @@ func AST_{{$name}}() {{$G.GoImport "adlast"}}ScopedDecl {
 }
 
 func init() {
-	{{$G.GoImport "goadl"}}RESOLVER.Register(
+	{{$G.GoImport "adl"}}RESOLVER.Register(
 		{{$G.GoImport "adlast"}}Make_ScopedName("{{.ModuleName}}", "{{.Name}}"),
 		AST_{{.Name}}(),
 	)

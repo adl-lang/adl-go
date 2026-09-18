@@ -4,7 +4,7 @@ package generics
 import (
 	"fmt"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/types"
 )
@@ -102,7 +102,7 @@ func (*Abc[A, B]) Default_e() Def[int64, string] {
 	)
 }
 func (*Abc[A, B]) Default_f() *Abc[int64, string] {
-	return goadl.Addr(MakeAll_Abc[int64, string](
+	return adl.Addr(MakeAll_Abc[int64, string](
 		4321,
 		[]string{
 			"aaa",

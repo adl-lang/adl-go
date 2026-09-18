@@ -2,7 +2,7 @@
 package cpp
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -127,7 +127,7 @@ func AST_CppCustomType() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.cpp", "CppCustomType"),
 		AST_CppCustomType(),
 	)
@@ -184,7 +184,7 @@ func AST_Include() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.cpp", "Include"),
 		AST_Include(),
 	)

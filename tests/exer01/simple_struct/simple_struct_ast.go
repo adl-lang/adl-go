@@ -2,7 +2,7 @@
 package simple_struct
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -95,7 +95,7 @@ func AST_StructOfPrimitives() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer01.simple_struct", "StructOfPrimitives"),
 		AST_StructOfPrimitives(),
 	)

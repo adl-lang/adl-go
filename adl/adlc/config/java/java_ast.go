@@ -2,7 +2,7 @@
 package java
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -87,7 +87,7 @@ func AST_JavaCustomType() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.java", "JavaCustomType"),
 		AST_JavaCustomType(),
 	)
@@ -124,7 +124,7 @@ func AST_JavaGenerate() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.java", "JavaGenerate"),
 		AST_JavaGenerate(),
 	)
@@ -161,7 +161,7 @@ func AST_JavaPackage() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.java", "JavaPackage"),
 		AST_JavaPackage(),
 	)

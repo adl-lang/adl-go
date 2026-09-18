@@ -2,7 +2,7 @@
 package rust
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -92,7 +92,7 @@ func AST_RustCustomType() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.rust", "RustCustomType"),
 		AST_RustCustomType(),
 	)
@@ -129,7 +129,7 @@ func AST_RustGenerate() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.rust", "RustGenerate"),
 		AST_RustGenerate(),
 	)
@@ -186,7 +186,7 @@ func AST_RustStorageModel() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.rust", "RustStorageModel"),
 		AST_RustStorageModel(),
 	)

@@ -2,7 +2,7 @@
 package haskell
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -158,7 +158,7 @@ func AST_HaskellCustomType() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.haskell", "HaskellCustomType"),
 		AST_HaskellCustomType(),
 	)
@@ -195,7 +195,7 @@ func AST_HaskellFieldPrefix() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.haskell", "HaskellFieldPrefix"),
 		AST_HaskellFieldPrefix(),
 	)
@@ -252,7 +252,7 @@ func AST_UnionConstructor() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("adlc.config.haskell", "UnionConstructor"),
 		AST_UnionConstructor(),
 	)

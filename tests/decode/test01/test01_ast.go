@@ -2,7 +2,7 @@
 package test01
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -40,7 +40,7 @@ func AST_A() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "A"),
 		AST_A(),
 	)
@@ -85,7 +85,7 @@ func AST_B() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "B"),
 		AST_B(),
 	)
@@ -130,7 +130,7 @@ func AST_Bool() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "Bool"),
 		AST_Bool(),
 	)
@@ -195,7 +195,7 @@ func AST_C() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "C"),
 		AST_C(),
 	)
@@ -255,7 +255,7 @@ func AST_D() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "D"),
 		AST_D(),
 	)
@@ -303,7 +303,7 @@ func AST_E() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "E"),
 		AST_E(),
 	)
@@ -561,7 +561,7 @@ func AST_F() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "F"),
 		AST_F(),
 	)
@@ -616,7 +616,7 @@ func AST_G() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "G"),
 		AST_G(),
 	)
@@ -663,7 +663,7 @@ func AST_GenericF() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "GenericF"),
 		AST_GenericF(),
 	)
@@ -710,7 +710,7 @@ func AST_HasDefault() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "HasDefault"),
 		AST_HasDefault(),
 	)
@@ -755,7 +755,7 @@ func AST_Int() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "Int"),
 		AST_Int(),
 	)
@@ -800,7 +800,7 @@ func AST_Json() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "Json"),
 		AST_Json(),
 	)
@@ -863,7 +863,7 @@ func AST_MapTest() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "MapTest"),
 		AST_MapTest(),
 	)
@@ -913,7 +913,7 @@ func AST_MyV() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "MyV"),
 		AST_MyV(),
 	)
@@ -958,7 +958,7 @@ func AST_NoDefault() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "NoDefault"),
 		AST_NoDefault(),
 	)
@@ -1010,7 +1010,7 @@ func AST_NullableString() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "NullableString"),
 		AST_NullableString(),
 	)
@@ -1067,7 +1067,7 @@ func AST_SetTest() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "SetTest"),
 		AST_SetTest(),
 	)
@@ -1119,7 +1119,7 @@ func AST_StringMapString() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "StringMapString"),
 		AST_StringMapString(),
 	)
@@ -1164,7 +1164,7 @@ func AST_Uint() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "Uint"),
 		AST_Uint(),
 	)
@@ -1196,7 +1196,7 @@ func AST_Unit() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "Unit"),
 		AST_Unit(),
 	)
@@ -1248,7 +1248,7 @@ func AST_VectorString() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("decode.test01", "VectorString"),
 		AST_VectorString(),
 	)

@@ -2,7 +2,7 @@
 package generics
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -252,7 +252,7 @@ func AST_Abc() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer03.generics", "Abc"),
 		AST_Abc(),
 	)
@@ -1196,7 +1196,7 @@ func AST_Def() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer03.generics", "Def"),
 		AST_Def(),
 	)
@@ -1559,7 +1559,7 @@ func AST_Zyx() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer03.generics", "Zyx"),
 		AST_Zyx(),
 	)

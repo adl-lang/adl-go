@@ -2,7 +2,7 @@
 package struct_of_structs_with_defaults
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -77,7 +77,7 @@ func AST_Bar() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer04.struct_of_structs_with_defaults", "Bar"),
 		AST_Bar(),
 	)
@@ -140,7 +140,7 @@ func AST_Fizz() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer04.struct_of_structs_with_defaults", "Fizz"),
 		AST_Fizz(),
 	)
@@ -187,7 +187,7 @@ func AST_Foo() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer04.struct_of_structs_with_defaults", "Foo"),
 		AST_Foo(),
 	)
@@ -228,7 +228,7 @@ func AST_NT() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer04.struct_of_structs_with_defaults", "NT"),
 		AST_NT(),
 	)
@@ -306,7 +306,7 @@ func AST_StructOfStruct() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer04.struct_of_structs_with_defaults", "StructOfStruct"),
 		AST_StructOfStruct(),
 	)

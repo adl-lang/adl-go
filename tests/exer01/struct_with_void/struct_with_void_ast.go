@@ -2,7 +2,7 @@
 package struct_with_void
 
 import (
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
@@ -49,7 +49,7 @@ func AST_StructB() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer01.struct_with_void", "StructB"),
 		AST_StructB(),
 	)
@@ -89,7 +89,7 @@ func AST_StructC() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer01.struct_with_void", "StructC"),
 		AST_StructC(),
 	)
@@ -134,7 +134,7 @@ func AST_StructOf() adlast.ScopedDecl {
 }
 
 func init() {
-	goadl.RESOLVER.Register(
+	adl.RESOLVER.Register(
 		adlast.Make_ScopedName("exer01.struct_with_void", "StructOf"),
 		AST_StructOf(),
 	)

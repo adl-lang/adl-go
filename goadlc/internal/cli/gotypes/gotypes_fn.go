@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	adl "github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gogen"
@@ -73,8 +73,8 @@ func thunk_gen_module(
 		slices.Sort(declsNames)
 		for _, k := range declsNames {
 			decl := m.Module_.Decls[k]
-			jb := goadl.CreateJsonDecodeBinding(goadl.Texpr_GoCustomType(), goadl.RESOLVER)
-			gct, err := goadl.GetAnnotation(decl.Annotations, gogen.GoCustomTypeSN, jb)
+			jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
+			gct, err := adl.GetAnnotation(decl.Annotations, gogen.GoCustomTypeSN, jb)
 			if err != nil {
 				panic(err)
 			}
@@ -104,7 +104,7 @@ func thunk_gen_module(
 					Name:    ".",
 					Aliased: true,
 				}}
-				err = astBody.WriteFile(in.Root, "goadl", filepath.Join(in.Outputdir, fname), in.NoGoFmt, specialImports)
+				err = astBody.WriteFile(in.Root, "adl", filepath.Join(in.Outputdir, fname), in.NoGoFmt, specialImports)
 				if err != nil {
 					return err
 				}
@@ -126,7 +126,7 @@ func (in *GoTypes) ReservedImports() []goimports.ImportSpec {
 		{Path: "reflect"},
 		{Path: "strings"},
 		{Path: "fmt"},
-		{Path: in.GoAdlPath, Aliased: true, Name: "goadl"},
+		{Path: in.GoAdlPath, Aliased: false, Name: "adl"},
 		{Path: in.GoAdlPath + "/sys/adlast", Aliased: false, Name: "adlast"},
 		{Path: in.GoAdlPath + "/adljson", Aliased: false, Name: "adljson"},
 		{Path: in.GoAdlPath + "/customtypes", Aliased: false, Name: "customtypes"},
@@ -142,7 +142,7 @@ func (in *GoTypes) specialTexpr() map[string]struct{} {
 }
 
 func (bg *GoTypes) GoImport(pkg string, currModuleName string, imports *goimports.Imports) (string, error) {
-	if _, ok := bg.specialTexpr()[currModuleName]; ok && bg._GoTypes.StdLibGen && pkg == "goadl" {
+	if _, ok := bg.specialTexpr()[currModuleName]; ok && bg._GoTypes.StdLibGen && pkg == "adl" {
 		return "", nil
 	}
 	if spec, ok := imports.ByName(pkg); !ok {
@@ -235,8 +235,8 @@ func generalTexpr(
 	type_name := decl.Name
 	tp := gogen.TypeParamsFromDecl(decl)
 
-	jb := goadl.CreateJsonDecodeBinding(goadl.Texpr_GoCustomType(), goadl.RESOLVER)
-	gct, err := goadl.GetAnnotation(decl.Annotations, gogen.GoCustomTypeSN, jb)
+	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
+	gct, err := adl.GetAnnotation(decl.Annotations, gogen.GoCustomTypeSN, jb)
 	if err != nil {
 		panic(err)
 	}
