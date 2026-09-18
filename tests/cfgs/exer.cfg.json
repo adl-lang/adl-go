@@ -20,6 +20,6 @@
   },
   "GoTypes": {
     "GoAdlPath": "github.com/adl-lang/adl-go/adl",
-    "Outputdir": "."
+    "Outputdir": "generated"
   }
 }

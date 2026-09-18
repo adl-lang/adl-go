@@ -2,8 +2,8 @@
 package a
 
 import (
-	b2 "adl_testing/exer02/another/b"
-	"adl_testing/exer02/b"
+	b2 "adl_testing/generated/exer02/another/b"
+	"adl_testing/generated/exer02/b"
 )
 
 type A struct {

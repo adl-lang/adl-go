@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"adl_testing/exer01/simple_union"
-	"adl_testing/exer01/struct01"
+	"adl_testing/generated/exer01/simple_union"
+	"adl_testing/generated/exer01/struct01"
 
 	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"

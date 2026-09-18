@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"adl_testing/decode/test01"
+	"adl_testing/generated/decode/test01"
 
 	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"

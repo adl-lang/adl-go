@@ -6,4 +6,4 @@ tasks:
 
   gen_exer:
     cmds:
-      - go run ../goadlc/main.go -cfg ./exer.cfg.json
+      - go run ../goadlc/main.go -cfg ./cfgs/exer.cfg.json

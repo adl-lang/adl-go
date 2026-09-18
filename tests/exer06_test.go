@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"testing"
 
-	"adl_testing/exer06/tttest"
+	"adl_testing/generated/exer06/tttest"
 
 	"adl_testing/diff"
 

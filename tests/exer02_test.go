@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"testing"
 
-	"adl_testing/exer02/a"
-	b2 "adl_testing/exer02/another/b"
-	"adl_testing/exer02/b"
+	"adl_testing/generated/exer02/a"
+	b2 "adl_testing/generated/exer02/another/b"
+	"adl_testing/generated/exer02/b"
 
 	"github.com/adl-lang/adl-go/adl"
 )

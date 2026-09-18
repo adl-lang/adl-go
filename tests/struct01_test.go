@@ -1,7 +1,7 @@
 package out_test
 
 import (
-	"adl_testing/exer01/struct01"
+	"adl_testing/generated/exer01/struct01"
 	"bytes"
 	"testing"
 

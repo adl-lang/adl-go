@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"adl_testing/exer03/generics"
+	"adl_testing/generated/exer03/generics"
 
 	"adl_testing/diff"
 
