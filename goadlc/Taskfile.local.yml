@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+
+  gen_stdlib:
+    cmds:
+      - go run main.go -cfg ./stdlib_go_adlc_config_go_.v2.cfg.json

@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+includes:
+
+  goadlc:
+    taskfile: ./goadlc/Taskfile.local.yml
+    dir: ./goadlc
+
+tasks:
+
+  hw:
+    cmds:
+      - echo "hw"
