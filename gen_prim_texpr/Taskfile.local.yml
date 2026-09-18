@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+
+  gen_texpr:
+    cmds:
+      - go run main.go > ../adl/sys/adlast/texpr.go

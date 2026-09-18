@@ -57,6 +57,20 @@ func (in *Loader) Load() (*LoadResult, error) {
 		return nil, fmt.Errorf("no file or pattern specified")
 	}
 	for _, p := range in.Files {
+		p = os.Expand(p, func(s string) string {
+			s2 := os.Getenv(s)
+			if s2 == "" && s == "ADLSTDLIB" {
+				cmd1 := exec.Command("adlc", "show", "--adlstdlib")
+				o, err := cmd1.CombinedOutput()
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error executing adlc to find stdlib\n")
+				}
+				path := strings.TrimSpace(string(o))
+				os.Setenv("ADLSTDLIB", path)
+				return path
+			}
+			return s2
+		})
 		matchs, err := zglob.Glob(p)
 		sort.Strings(matchs)
 		if err != nil {
@@ -101,6 +115,7 @@ func loadAdl(
 	out1, err := cmd1.CombinedOutput()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error calling adlc to generate individual ast files. err : %v\n", err)
+		fmt.Fprintf(os.Stderr, "  args   '%v'\n", args1)
 		fmt.Fprintf(os.Stderr, "  output '%s'\n", string(out1))
 		return nil, nil, err
 	}

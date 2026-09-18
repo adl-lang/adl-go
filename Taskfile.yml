@@ -8,6 +8,10 @@ includes:
     taskfile: ./goadlc/Taskfile.local.yml
     dir: ./goadlc
 
+  gen_prim_texpr:
+    taskfile: ./gen_prim_texpr/Taskfile.local.yml
+    dir: ./gen_prim_texpr
+
 tasks:
 
   hw:
