@@ -12,6 +12,10 @@ includes:
     taskfile: ./gen_prim_texpr/Taskfile.local.yml
     dir: ./gen_prim_texpr
 
+  tests:
+    taskfile: ./tests/Taskfile.local.yml
+    dir: ./tests
+
 tasks:
 
   hw:
