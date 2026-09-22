@@ -7,16 +7,15 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"text/template"
 
 	"github.com/adl-lang/adl-go/adl"
-
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gengo"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goapi"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gomod"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gotypes"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/loader"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/root"
+	"github.com/millergarym/gotmpl/text/template"
 )
 
 func main() {

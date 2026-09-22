@@ -3,7 +3,8 @@ package gogen
 import (
 	"embed"
 	"strings"
-	"text/template"
+
+	"github.com/millergarym/gotmpl/text/template"
 
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 )

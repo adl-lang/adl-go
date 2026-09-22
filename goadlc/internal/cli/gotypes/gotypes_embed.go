@@ -3,10 +3,10 @@ package gotypes
 import (
 	"embed"
 	"strings"
-	"text/template"
 
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gogen"
+	"github.com/millergarym/gotmpl/text/template"
 )
 
 func public(s string) string {
