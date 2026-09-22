@@ -6,7 +6,7 @@ import (
 	"runtime/debug"
 	"strings"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 	"github.com/samber/lo"
@@ -99,14 +99,14 @@ func (in *BaseGen) goType(
 			if !ok {
 				panic(fmt.Errorf("cannot find decl '%v", ref))
 			}
-			if goadl.HasAnnotation(decl.Annotations, GoCustomTypeSN) {
+			if adl.HasAnnotation(decl.Annotations, GoCustomTypeSN) {
 				return in.gotype_ref_customtype(decl, typeExpr, unionTypeParams, anns)
 			}
 			// go can't have typeParam on lhs in type alias, so replace with concrete type
 			if typ, ok := decl.Type_.Cast_type_(); ok {
 				if len(typ.TypeParams) != 0 {
-					tbind := goadl.CreateDecBoundTypeParams(typ.TypeParams, typeExpr.Parameters)
-					monoTe, _ := goadl.SubstituteTypeBindings(tbind, typ.TypeExpr)
+					tbind := adl.CreateDecBoundTypeParams(typ.TypeParams, typeExpr.Parameters)
+					monoTe, _ := adl.SubstituteTypeBindings(tbind, typ.TypeExpr)
 					return in.goType(monoTe, unionTypeParams, anns)
 				}
 			}
@@ -135,8 +135,8 @@ func (in *BaseGen) goType(
 }
 
 func get_type_constraints(anns adlast.Annotations) []string {
-	jb := goadl.CreateJsonDecodeBinding(goadl.Texpr_TypeParamConstraintList(), goadl.RESOLVER)
-	lst, err := goadl.GetAnnotation(anns, TypeParamConstraintListSN, jb)
+	jb := adl.CreateJsonDecodeBinding(adl.Texpr_TypeParamConstraintList(), adl.RESOLVER)
+	lst, err := adl.GetAnnotation(anns, TypeParamConstraintListSN, jb)
 	if err != nil {
 		panic(err)
 	}
@@ -152,8 +152,8 @@ func (in *BaseGen) gotype_ref_customtype(
 	unionTypeParams *TypeParam,
 	anns adlast.Annotations,
 ) goTypeExpr {
-	jb := goadl.CreateJsonDecodeBinding(goadl.Texpr_GoCustomType(), goadl.RESOLVER)
-	gct, err := goadl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
+	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
+	gct, err := adl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
 	if err != nil {
 		panic(fmt.Errorf("error getting go_custom_type annotation for %v. err : %w", decl.Name, err))
 	}

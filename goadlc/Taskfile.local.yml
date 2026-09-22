@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+
+  gen_adlast:
+    cmds:
+      - go run main.go -cfg ./cfgs/adlast.v2.cfg.json
+
+  gen_goadlc:
+    cmds:
+      - go run main.go -cfg ./cfgs/goadlc.v2.cfg.json
+
+  gen_stdlib:
+    cmds:
+      - go run main.go -cfg ./cfgs/stdlib_go_adlc_config_go_.v2.cfg.json

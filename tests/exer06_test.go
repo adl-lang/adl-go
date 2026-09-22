@@ -4,23 +4,23 @@ import (
 	"bytes"
 	"testing"
 
-	"adl_testing/exer06/tttest"
+	"adl_testing/generated/exer06/tttest"
 
 	"adl_testing/diff"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 )
 
 func TestTypeTokenEncode(t *testing.T) {
 	z := tttest.Make_Z()
-	enc := goadl.CreateJsonEncodeBinding(tttest.Texpr_Z(), goadl.RESOLVER)
+	enc := adl.CreateJsonEncodeBinding(tttest.Texpr_Z(), adl.RESOLVER)
 	buf := bytes.Buffer{}
 	err := enc.Encode(&buf, z)
 	if err != nil {
 		t.Error(err)
 	}
 	a := buf.String()
-	dec := goadl.CreateJsonDecodeBinding(tttest.Texpr_Z(), goadl.RESOLVER)
+	dec := adl.CreateJsonDecodeBinding(tttest.Texpr_Z(), adl.RESOLVER)
 	var z2 tttest.Z
 	err = dec.Decode(&buf, &z2)
 	if err != nil {

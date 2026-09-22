@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"golang.org/x/mod/modfile"
 )
 
@@ -54,7 +54,7 @@ func fromGoModFile(goModFile string, debug bool) (*GoModResult, error) {
 				fmt.Fprintf(os.Stderr, "using module-path found in go.mod file. module-path:%s\n", modulePath)
 			}
 			rootDir := filepath.Dir(goModFile)
-			return goadl.Addr(Make_GoModResult(modulePath, rootDir)), nil
+			return adl.Addr(Make_GoModResult(modulePath, rootDir)), nil
 		} else {
 			return nil, fmt.Errorf("module-path needed. Not specified in --module-path and couldn't be found in a go.mod file")
 		}

@@ -1,0 +1,21 @@
+{
+  "Loader": {
+    "Searchdir": [
+    ],
+    "MergeAdlext": "",
+    "Files": [
+      "adl/stdlib_go/adlc/config/go_.adl"
+    ]
+  },
+  "Mod": {
+    "Outputdir": "../adl"
+  },
+  "GoTypes": {
+    "NoGoFmt": false,
+    "GoAdlPath": "github.com/adl-lang/adl-go/adl",
+    "ExcludeAst": false,
+    "StdLibGen": true,
+    "Outputdir": "../adl"
+  },
+  "GoApis": null
+}

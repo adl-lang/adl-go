@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/samber/lo"
 )
@@ -44,8 +44,8 @@ func TypeParamsFromDecl(decl adlast.Decl) TypeParam {
 		},
 		nil,
 	)
-	jb := goadl.CreateJsonDecodeBinding(goadl.Texpr_TypeParamConstraintList(), goadl.RESOLVER)
-	lst, err := goadl.GetAnnotation(decl.Annotations, TypeParamConstraintListSN, jb)
+	jb := adl.CreateJsonDecodeBinding(adl.Texpr_TypeParamConstraintList(), adl.RESOLVER)
+	lst, err := adl.GetAnnotation(decl.Annotations, TypeParamConstraintListSN, jb)
 	if err != nil {
 		panic(err)
 	}

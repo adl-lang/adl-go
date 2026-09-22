@@ -2,9 +2,9 @@
 {{.G.GoImport "adljson"}}Unwrap(((*{{.CustomTypeHelper}})(nil)).Construct(
 		&{{.CustomType}}{{.TypeParams.RSide}}{},
 		{{.AnyValue}},
-		{{range .TypeExprStrs}}{{$G.GoImport "goadl"}}CreateUncheckedJsonDecodeBinding(
+		{{range .TypeExprStrs}}{{$G.GoImport "adl"}}CreateUncheckedJsonDecodeBinding(
 			{{.}},
-			{{$G.GoImport "goadl"}}RESOLVER,
+			{{$G.GoImport "adl"}}RESOLVER,
 		).Binder(),
 		{{end}}
 	)).({{.CustomType}}{{.TypeParams.RSide}})

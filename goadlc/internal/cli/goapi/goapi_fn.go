@@ -5,7 +5,7 @@ import (
 	fp "path/filepath"
 	"strings"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gogen"
@@ -374,8 +374,8 @@ func ExpandTypeAliases(lr *loader.LoadResult, te adlast.TypeExpr) adlast.TypeExp
 			panic(fmt.Errorf("can't resolve type alias, %v ", ref))
 		} else {
 			if ta, ok1 := decl.Type_.Cast_type_(); ok1 {
-				binding := goadl.CreateDecBoundTypeParams(ta.TypeParams, ta.TypeExpr.Parameters)
-				mono, _ := goadl.SubstituteTypeBindings(binding, ta.TypeExpr)
+				binding := adl.CreateDecBoundTypeParams(ta.TypeParams, ta.TypeExpr.Parameters)
+				mono, _ := adl.SubstituteTypeBindings(binding, ta.TypeExpr)
 				return ExpandTypeAliases(lr, mono)
 			}
 		}

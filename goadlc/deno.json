@@ -1,6 +1,0 @@
-{
-  "lock": "./deno.lock",
-  "tasks" : {
-    "gen-adl" : "deno run --quiet --unstable --allow-all gen-adl.ts"
-  }
-}

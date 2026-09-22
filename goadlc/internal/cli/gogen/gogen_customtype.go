@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	goadl "github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 )
@@ -15,8 +15,8 @@ var GoCustomTypeSN = adlast.Make_ScopedName(
 )
 
 func (in *Generator) GoRegisterHelper(moduleName string, decl adlast.Decl) (string, error) {
-	jb := goadl.CreateJsonDecodeBinding(goadl.Texpr_GoCustomType(), goadl.RESOLVER)
-	gct, err := goadl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
+	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
+	gct, err := adl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
 	if err != nil {
 		return "", err
 	}
@@ -42,7 +42,7 @@ func (in *Generator) GoRegisterHelper(moduleName string, decl adlast.Decl) (stri
 		)
 `, moduleName, decl.Name, helperName), nil
 	}
-	return fmt.Sprintf(`	goadl.RESOLVER.RegisterHelper(
+	return fmt.Sprintf(`	adl.RESOLVER.RegisterHelper(
 			adlast.Make_ScopedName("%s", "%s"),
 			(*%s)(nil),
 		)

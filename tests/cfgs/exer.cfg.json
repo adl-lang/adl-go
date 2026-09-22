@@ -1,0 +1,25 @@
+{
+  "Loader": {
+    "Searchdir": [
+      "adl"
+    ],
+    "MergeAdlext": "adl-go",
+    "BundleMaps": [
+      {
+        "AdlModuleNamePrefix": "sys",
+        "GoModPath": "github.com/adl-lang/adl-go/adl",
+        "AdlSrc": "file://../goadlc/adl/stdlib_go"
+      }
+    ],
+    "Files": [
+      "adl/**/*.adl"
+    ]
+  },
+  "Mod": {
+    "Outputdir": "."
+  },
+  "GoTypes": {
+    "GoAdlPath": "github.com/adl-lang/adl-go/adl",
+    "Outputdir": "generated"
+  }
+}
