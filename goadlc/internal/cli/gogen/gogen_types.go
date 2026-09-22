@@ -8,11 +8,11 @@ import (
 	"reflect"
 	"runtime/debug"
 	"strings"
-	"text/template"
 
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/loader"
+	"github.com/millergarym/gotmpl/text/template"
 )
 
 type SnResolver func(sn adlast.ScopedName) (*adlast.Decl, bool)

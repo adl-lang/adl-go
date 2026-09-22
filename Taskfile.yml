@@ -18,6 +18,10 @@ includes:
 
 tasks:
 
-  hw:
+  gen:
     cmds:
-      - echo "hw"
+      - task gen_prim_texpr:gen_texpr
+      - task goadlc:gen_adlast
+      - task goadlc:gen_goadlc
+      - task goadlc:gen_stdlib
+      - task tests:gen_exer
