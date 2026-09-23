@@ -30,3 +30,4 @@ tasks:
   test:
     cmds:
       - task tests:test
+      - task goadlc:test

@@ -15,20 +15,8 @@ import (
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
 
-	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
-
 	"github.com/samber/lo"
 )
-
-func (*Generator) JsonEncode(val any) string {
-	var buf bytes.Buffer
-	enc := json.NewEncoder(&buf)
-	err := enc.Encode(val)
-	if err != nil {
-		panic(err)
-	}
-	return string(bytes.Trim(buf.Bytes(), "\n"))
-}
 
 func (bg *Generator) GoDeclValue(val adlast.Decl) string {
 	defer func() {
@@ -178,36 +166,13 @@ func (bg *Generator) goCustomType(
 	gt goTypeExpr,
 	val any,
 ) string {
-	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
-	gct, err := adl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
-	if err != nil {
-		panic(err)
-	}
-	{
-		pkg := gct.Gotype.Import_path[strings.LastIndex(gct.Gotype.Import_path, "/")+1:]
-		spec := goimports.ImportSpec{
-			Path:    gct.Gotype.Import_path,
-			Name:    gct.Gotype.Pkg,
-			Aliased: gct.Gotype.Pkg != pkg,
-		}
-		bg.Imports.AddSpec(spec)
-	}
+	gct := GoCustomTypeAnn(decl.Annotations)
+	bg.Imports.AddSpec(GoCustomTypeSpec(gct))
 
 	typeExprStrs := lo.Map[adlast.TypeExpr, string](monoTe.Parameters, func(a adlast.TypeExpr, _ int) string {
 		return bg.strRep(a)
 	})
 
-	helperName := gct.Helpers.Name
-	if gct.Helpers.Ref != nil {
-		helperName = gct.Helpers.Ref.Pkg + "." + gct.Helpers.Name
-		pkg := gct.Helpers.Ref.Import_path[strings.LastIndex(gct.Helpers.Ref.Import_path, "/")+1:]
-		spec := goimports.ImportSpec{
-			Path:    gct.Helpers.Ref.Import_path,
-			Name:    gct.Helpers.Ref.Pkg,
-			Aliased: gct.Helpers.Ref.Pkg != pkg,
-		}
-		bg.Imports.AddSpec(spec)
-	}
 	return custTypeConstructionParams{
 		G:                bg,
 		Name:             decl.Name,
@@ -215,7 +180,7 @@ func (bg *Generator) goCustomType(
 		TypeParams:       gt.TypeParams,
 		AnyValue:         fmt.Sprintf("%+#v", val),
 		CustomType:       gct.Gotype.Pkg + "." + gct.Gotype.Name,
-		CustomTypeHelper: helperName,
+		CustomTypeHelper: bg.HelperName(gct),
 		TypeExprStrs:     typeExprStrs,
 	}.StringRep()
 }

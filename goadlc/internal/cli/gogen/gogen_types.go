@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
-	"strings"
 
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
@@ -34,27 +33,6 @@ type Generator struct {
 	*BaseGen
 }
 
-// // sign used by templates
-// type BaseGenerator interface {
-// 	GoType(typeExpr adlast.TypeExpr, anns customtypes.MapMap[adlast.ScopedName, any]) goTypeExpr
-// 	PrimitiveMap(p string, params []adlast.TypeExpr, unionTypeParams *TypeParam, anns customtypes.MapMap[adlast.ScopedName, any]) goTypeExpr
-// 	goType(typeExpr adlast.TypeExpr, unionTypeParams *TypeParam, anns customtypes.MapMap[adlast.ScopedName, any]) goTypeExpr
-// 	gotype_ref_customtype(decl *adlast.Decl, typeExpr adlast.TypeExpr, unionTypeParams *TypeParam, anns customtypes.MapMap[adlast.ScopedName, any]) goTypeExpr
-// }
-
-// type GoGenerator interface {
-// 	GoDeclValue(val adlast.Decl) string
-// 	GoEscape(n string) string
-// 	GoImport(s string) (string, error)
-// 	GoRegisterHelper(moduleName string, decl adlast.Decl) (string, error)
-// 	GoTexprValue(val adlast.TypeExpr, anns customtypes.MapMap[adlast.ScopedName, any]) string
-// 	GoValue(anns customtypes.MapMap[adlast.ScopedName, any], te adlast.TypeExpr, val any) string
-// 	JsonEncode(val any) string
-// 	ToTitle(s string) string
-// 	goCustomType(decl *adlast.Decl, monoTe adlast.TypeExpr, gt goTypeExpr, val any) string
-// 	strRep(te adlast.TypeExpr) string
-// }
-
 func (in *Generator) GoImport(s string) (string, error) {
 	defer func() {
 		r := recover()
@@ -77,17 +55,6 @@ func (in *Generator) mustImport(pkg string) string {
 		panic(err)
 	}
 	return qualifier
-}
-
-func (in *Generator) ToTitle(s string) string {
-	return strings.ToTitle(s)
-}
-
-func (in *Generator) GoEscape(n string) string {
-	if g, h := goKeywords[n]; h {
-		return g
-	}
-	return n
 }
 
 func NewBaseGen(

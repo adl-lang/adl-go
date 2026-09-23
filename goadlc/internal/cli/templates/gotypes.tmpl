@@ -193,5 +193,17 @@ func init() {
 		{{$G.GoImport "adlast"}}Make_ScopedName("{{.ModuleName}}", "{{.Name}}"),
 		AST_{{.Name}}(),
 	)
-	{{$G.GoRegisterHelper .ModuleName .Decl}}}
+	{{template "registerHelper" .}}}
 {{end}}
+
+{{/*
+The custom-type helper registration of one decl, or nothing when the decl
+carries no go_custom_type annotation. Calling RegisterHelperName is what
+registers the helper package's import, so it runs even for the stdlib form
+that needs no qualifier.
+*/}}
+{{define "registerHelper"}}{{$G := .G}}{{$helper := $G.RegisterHelperName .Decl}}{{if $helper}}	{{if not $G.IsStdLibGen}}adl.{{end}}RESOLVER.RegisterHelper(
+			adlast.Make_ScopedName("{{.ModuleName}}", "{{.Name}}"),
+			(*{{$helper}})(nil),
+		)
+{{end}}{{end}}

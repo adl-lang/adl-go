@@ -1,7 +1,6 @@
 package gogen
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/adl-lang/adl-go/adl"
@@ -29,47 +28,45 @@ func GoCustomTypeAnn(anns adlast.Annotations) *go_.GoCustomType {
 	return gct
 }
 
-// GoCustomTypeSpec is the import that referencing the custom type requires.
-func GoCustomTypeSpec(gct *go_.GoCustomType) goimports.ImportSpec {
-	pkg := gct.Gotype.Import_path[strings.LastIndex(gct.Gotype.Import_path, "/")+1:]
+// importSpecFor is the import that referencing pkg at importPath requires.
+// The name is an alias whenever it differs from the path's last segment.
+func importSpecFor(importPath, pkg string) goimports.ImportSpec {
+	last := importPath[strings.LastIndex(importPath, "/")+1:]
 	return goimports.ImportSpec{
-		Path:    gct.Gotype.Import_path,
-		Name:    gct.Gotype.Pkg,
-		Aliased: gct.Gotype.Pkg != pkg,
+		Path:    importPath,
+		Name:    pkg,
+		Aliased: pkg != last,
 	}
 }
 
-func (in *Generator) GoRegisterHelper(moduleName string, decl adlast.Decl) (string, error) {
-	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
-	gct, err := adl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
-	if err != nil {
-		return "", err
+// GoCustomTypeSpec is the import that referencing the custom type requires.
+func GoCustomTypeSpec(gct *go_.GoCustomType) goimports.ImportSpec {
+	return importSpecFor(gct.Gotype.Import_path, gct.Gotype.Pkg)
+}
+
+// HelperName is the Go name of a custom type's helper, qualified when the
+// helper lives in another package - in which case calling this registers
+// that package's import.
+func (in *Generator) HelperName(gct *go_.GoCustomType) string {
+	if gct.Helpers.Ref == nil {
+		return gct.Helpers.Name
 	}
-	if gct == nil {
-		return "", nil
+	in.Imports.AddSpec(importSpecFor(gct.Helpers.Ref.Import_path, gct.Helpers.Ref.Pkg))
+	return gct.Helpers.Ref.Pkg + "." + gct.Helpers.Name
+}
+
+// RegisterHelperName is the helper the "registerHelper" template registers
+// for decl, or "" when the decl carries no go_custom_type annotation.
+func (in *Generator) RegisterHelperName(decl adlast.Decl) string {
+	var gct *go_.GoCustomType
+	if gct = GoCustomTypeAnn(decl.Annotations); gct == nil {
+		return ""
 	}
-	helperName := gct.Helpers.Name
-	if gct.Helpers.Ref != nil {
-		helperName = gct.Helpers.Ref.Pkg + "." + gct.Helpers.Name
-		pkg := gct.Helpers.Ref.Import_path[strings.LastIndex(gct.Helpers.Ref.Import_path, "/")+1:]
-		spec := goimports.ImportSpec{
-			Path:    gct.Helpers.Ref.Import_path,
-			Name:    gct.Helpers.Ref.Pkg,
-			Aliased: gct.Helpers.Ref.Pkg != pkg,
-		}
-		in.Imports.AddSpec(spec)
-	}
-	// if this gets into trouble use in.GoImport
-	if in.Cli.IsStdLibGen() {
-		return fmt.Sprintf(`	RESOLVER.RegisterHelper(
-			adlast.Make_ScopedName("%s", "%s"),
-			(*%s)(nil),
-		)
-`, moduleName, decl.Name, helperName), nil
-	}
-	return fmt.Sprintf(`	adl.RESOLVER.RegisterHelper(
-			adlast.Make_ScopedName("%s", "%s"),
-			(*%s)(nil),
-		)
-`, moduleName, decl.Name, helperName), nil
+	return in.HelperName(gct)
+}
+
+// IsStdLibGen reports whether this is the generation of the adl stdlib
+// itself, which registers into its own RESOLVER rather than adl's.
+func (in *Generator) IsStdLibGen() bool {
+	return in.Cli.IsStdLibGen()
 }
