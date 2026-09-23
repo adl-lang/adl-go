@@ -160,10 +160,10 @@ func (bg *goval_gen) goValue(
 				},
 				func(newtype_ adlast.NewType) string {
 					monoTe, _ := adl.SubstituteTypeBindings(tbind, newtype_.TypeExpr)
-					return RenderString("ctorParams", ctorParams{
+					return ctorParams{
 						Ctor: gt.String(),
 						Args: []string{bg.goValue(decl.Annotations, monoTe, val)},
-					})
+					}.StringRep()
 				},
 				nil,
 			)
@@ -309,10 +309,10 @@ func (bg *goval_gen) goStruct(
 		}
 		return ret
 	})
-	return RenderString("ctorParams", ctorParams{
+	return ctorParams{
 		Ctor: qualify(gt.Pkg) + "MakeAll_" + gt.Type + gt.TypeParams.RSide(),
 		Args: ret,
-	})
+	}.StringRep()
 }
 
 func (bg *goval_gen) goUnion(
@@ -385,7 +385,7 @@ func (bg *goval_gen) goUnion(
 	if pr, isPrim := fld.TypeExpr.TypeRef.Cast_primitive(); !isPrim || pr != "Void" {
 		ctor.Args = []string{bg.goValue(fld.Annotations, monoTe, v)}
 	}
-	return RenderString("ctorParams", ctor)
+	return ctor.StringRep()
 
 	// ret := []string{
 	// 	fmt.Sprintf("%s%s_%s%s{\nV: %v}",
@@ -405,6 +405,22 @@ func (bg *goval_gen) goUnion(
 type ctorParams struct {
 	Ctor string
 	Args []string
+}
+
+func (p ctorParams) StringRep() string {
+	sb := &strings.Builder{}
+	sb.WriteString(p.Ctor)
+	sb.WriteString("(")
+	for i, a := range p.Args {
+		if i == 0 {
+			sb.WriteString("\n")
+		}
+		sb.WriteString(a)
+		sb.WriteString(",")
+		sb.WriteString("\n")
+	}
+	sb.WriteString(")")
+	return sb.String()
 }
 
 // annMapParams renders the annotations map of a generated AST decl.

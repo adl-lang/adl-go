@@ -45,10 +45,6 @@ import ({{range .Imports}}
 
 {{/* ---------- generated-constructor calls ---------- */}}
 
-{{define "ctorParams"}}{{.Ctor}}({{if .Args}}
-{{range .Args}}{{.}},
-{{end}}{{end}}){{end}}
-
 {{define "annEntryParams"}}adlast.Make_ScopedName("{{.ModuleName}}", "{{.Name}}"): {{if .IsNil}}nil{{else}}{{.GoSyntax}}{{end}}{{end}}
 
 {{define "annMapParams"}}customtypes.MapMap[adlast.ScopedName, any]{{"{"}}{{range $i, $e := .Entries}}{{if $i}},{{end}}{{$e}}{{end}}{{"}"}}{{end}}

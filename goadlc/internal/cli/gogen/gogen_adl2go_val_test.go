@@ -111,7 +111,7 @@ func TestCtorParamsTemplate(t *testing.T) {
 		{"two args", ctorParams{Ctor: "MakeAll_X", Args: []string{"a", "b"}}, "MakeAll_X(\na,\nb,\n)"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := RenderString("ctorParams", tc.in); got != tc.want {
+			if got := tc.in.StringRep(); got != tc.want {
 				t.Errorf("got  %q\nwant %q", got, tc.want)
 			}
 		})
