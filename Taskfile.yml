@@ -25,3 +25,8 @@ tasks:
       - task goadlc:gen_goadlc
       - task goadlc:gen_stdlib
       - task tests:gen_exer
+      - task tests:gen_api
+
+  test:
+    cmds:
+      - task tests:test

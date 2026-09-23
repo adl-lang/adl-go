@@ -1,0 +1,32 @@
+module api01.api {
+
+import common.http.HttpPost;
+import common.http.HttpGet;
+
+struct Endpoints {
+  HttpPost<LoginReq,LoginResp> login = {
+    "path": "/login",
+    "security" : "public"
+  };
+  HttpGet<WhoAmIResp> whoAmI = {
+    "path": "/whoami",
+    "security" : "token"
+  };
+};
+
+struct LoginReq {
+  String username;
+  String password;
+};
+
+union LoginResp {
+  String error;
+  String user_token;
+  String admin_token;
+};
+
+struct WhoAmIResp {
+  String username;
+};
+
+};

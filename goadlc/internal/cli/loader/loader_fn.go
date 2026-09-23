@@ -42,6 +42,7 @@ func (in *Loader) Load() (*LoadResult, error) {
 		if strings.HasPrefix(bm.AdlSrc, "https://") && strings.HasSuffix(bm.AdlSrc, ".zip") {
 			path, err := in.zippedBundle(bm)
 			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error getting zipped bundle. src: %s, err %v\n", bm.AdlSrc, err)
 				return nil, err
 			}
 			if bm.Path != nil {
@@ -210,7 +211,7 @@ func (in *Loader) zippedBundle(bm BundleMap) (string, error) {
 	file := bm.AdlSrc[strings.LastIndex(bm.AdlSrc, "/"):]
 	zipdir := filepath.Join(in.UserCacheDir, "download", path)
 	zipfile := filepath.Join(zipdir, file)
-	if _, err := os.Stat(zipfile); err != nil {
+	if fstat, err := os.Stat(zipfile); err != nil || fstat.Size() == 0 {
 		if err := os.MkdirAll(zipdir, 0777); err != nil {
 			return "", fmt.Errorf("error creating dir for zip adlsrc '%s' err: %w", zipdir, err)
 		}
