@@ -13,7 +13,6 @@ import (
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gomod"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/loader"
 
-	"github.com/samber/lo"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -164,60 +163,16 @@ func generalDeclV3(
 	in *gogen.Generator,
 	decl adlast.Decl,
 ) {
-	typeParams := gogen.TypeParamsFromDecl(decl)
-	adlast.Handle_DeclType[any](
-		decl.Type_,
-		func(s adlast.Struct) any {
-
-			in.Rr.Render(structParams{
-				G:          in,
-				Name:       decl.Name,
-				TypeParams: typeParams,
-				Fields: lo.Map(s.Fields, func(f adlast.Field, _ int) fieldParams {
-					return makeFieldParam(f, decl.Name, in)
-				}),
-			})
-			return nil
-		},
-		func(u adlast.Union) any {
-			in.Rr.Render(unionParams{
-				G:          in,
-				Name:       decl.Name,
-				TypeParams: typeParams,
-				Branches: lo.Map[adlast.Field, fieldParams](u.Fields, func(f adlast.Field, _ int) fieldParams {
-					return makeFieldParam(f, decl.Name, in)
-				}),
-			})
-			return nil
-		},
-		func(td adlast.TypeDef) any {
-			if typ, ok := decl.Type_.Cast_type_(); ok {
-				if len(typ.TypeParams) != 0 {
-					// in go "type X<A any> = ..." isn't valid, skipping
-					return nil
-				}
-			}
-			in.Rr.Render(typeAliasParams{
-				G:           in,
-				Name:        decl.Name,
-				TypeParams:  typeParams,
-				TypeExpr:    td.TypeExpr,
-				Annotations: decl.Annotations,
-			})
-			return nil
-		},
-		func(nt adlast.NewType) any {
-			in.Rr.Render(newTypeParams{
-				G:           in,
-				Name:        decl.Name,
-				TypeParams:  typeParams,
-				TypeExpr:    nt.TypeExpr,
-				Annotations: decl.Annotations,
-			})
-			return nil
-		},
-		nil,
-	)
+	if typ, ok := decl.Type_.Cast_type_(); ok && len(typ.TypeParams) != 0 {
+		// in go "type X<A any> = ..." isn't valid, skipping
+		return
+	}
+	in.Rr.Render(declParams{
+		G:          in,
+		Decl:       decl,
+		Name:       decl.Name,
+		TypeParams: gogen.TypeParamsFromDecl(decl),
+	})
 }
 
 func generalTexpr(
@@ -272,16 +227,4 @@ func generalReg(
 		Decl:       decl,
 		TypeParams: tp,
 	})
-}
-
-func makeFieldParam(
-	f adlast.Field,
-	declName string,
-	gen *gogen.Generator,
-) fieldParams {
-	return fieldParams{
-		Field:    gogen.Field{Field: f},
-		DeclName: declName,
-		G:        gen,
-	}
 }

@@ -7,44 +7,46 @@ by Go type name via gotmpl's tmpl_by_type.
 
 {{/* ---------- decls ---------- */}}
 
-{{define "structParams"}}{{$decl := .}}
-{{$name := .Name | public}}
-{{$G := .G}}
+{{define "declParams"}}{{$P := .}}{{tmpl_by_type .Decl.Type_.Branch.V "decl_" ""}}{{end}}
+
+{{define "decl_Struct"}}{{$decl := $P}}
+{{$name := $decl.Name | public}}
+{{$G := $decl.G}}
 type {{$name}}{{$decl.TypeParams.LSide}} struct {
 	_{{$name}}{{$decl.TypeParams.RSide}}
 }
 
 type _{{$name}}{{$decl.TypeParams.LSide}} struct {
-{{range .Fields}}	{{.Name|public}} {{$G.GoType .TypeExpr .Annotations}} `json:"{{.SerializedName}}"`
+{{range $decl.Fields}}	{{.Name|public}} {{$G.GoType .TypeExpr .Annotations}} `json:"{{.SerializedName}}"`
 {{end -}}
 }
 
-func MakeAll_{{$name}}{{.TypeParams.LSide}}(
-{{range .Fields}}{{if not .IsVoid}}	{{.Name | lower | .G.GoEscape}} {{$G.GoType .TypeExpr .Annotations}},
+func MakeAll_{{$name}}{{$decl.TypeParams.LSide}}(
+{{range $decl.Fields}}{{if not .IsVoid}}	{{.Name | lower | $G.GoEscape}} {{$G.GoType .TypeExpr .Annotations}},
 {{end}}{{end -}}
-) {{$name}}{{.TypeParams.RSide}} {
-	return {{$name}}{{.TypeParams.RSide}}{
-		_{{$name}}{{.TypeParams.RSide}}{
-{{range .Fields}}
+) {{$name}}{{$decl.TypeParams.RSide}} {
+	return {{$name}}{{$decl.TypeParams.RSide}}{
+		_{{$name}}{{$decl.TypeParams.RSide}}{
+{{range $decl.Fields}}
 {{- if .IsVoid -}}
 {{$type := $G.GoType .TypeExpr .Annotations}}			{{.Name | public}}: struct{}{},
 {{- else -}}
-{{$type := $G.GoType .TypeExpr .Annotations}}			{{.Name | public}}: {{.Name | lower | .G.GoEscape}},
+{{$type := $G.GoType .TypeExpr .Annotations}}			{{.Name | public}}: {{.Name | lower | $G.GoEscape}},
 {{- end}}
 {{end}}	},
 		}
 }
 
-{{if .ContainsTypeToken}}
+{{if $decl.ContainsTypeToken}}
 // struct {{$name}} contains at least one TypeToken, not generating Make_ funcs
 {{else}}
-func Make_{{$name}}{{.TypeParams.LSide}}(
-{{range .Fields}}{{if not .IsVoid}}{{if not .HasDefault}}	{{.Name | lower | .G.GoEscape}} {{$G.GoType .TypeExpr .Annotations}},
+func Make_{{$name}}{{$decl.TypeParams.LSide}}(
+{{range $decl.Fields}}{{if not .IsVoid}}{{if not .HasDefault}}	{{.Name | lower | $G.GoEscape}} {{$G.GoType .TypeExpr .Annotations}},
 {{end}}{{end}}{{end -}}
-) {{$name}}{{.TypeParams.RSide}} {
-	ret := {{$name}}{{.TypeParams.RSide}}{
-		_{{$name}}{{.TypeParams.RSide}}{
-{{range .Fields}}{{$type := $G.GoType .TypeExpr .Annotations}} {{if not .IsVoid}} {{if not .HasDefault}}		{{.Name | public}}: {{.Name | lower | .G.GoEscape}},
+) {{$name}}{{$decl.TypeParams.RSide}} {
+	ret := {{$name}}{{$decl.TypeParams.RSide}}{
+		_{{$name}}{{$decl.TypeParams.RSide}}{
+{{range $decl.Fields}}{{$type := $G.GoType .TypeExpr .Annotations}} {{if not .IsVoid}} {{if not .HasDefault}}		{{.Name | public}}: {{.Name | lower | $G.GoEscape}},
 {{else}}		{{.Name | public}}: ((*{{$name}}{{$decl.TypeParams.RSide}})(nil)).Default_{{.Name}}(),
 {{end}}
 {{- else -}}
@@ -55,15 +57,15 @@ func Make_{{$name}}{{.TypeParams.LSide}}(
 	return ret
 }
 
-{{range .Fields}}{{$type := $G.GoType .TypeExpr .Annotations}}{{if .HasDefault}}func (*{{$decl.Name}}{{$decl.TypeParams.RSide}}) Default_{{.Name | $G.GoEscape}}() {{$type}} {
+{{range $decl.Fields}}{{$type := $G.GoType .TypeExpr .Annotations}}{{if .HasDefault}}func (*{{$decl.Name}}{{$decl.TypeParams.RSide}}) Default_{{.Name | $G.GoEscape}}() {{$type}} {
 	return {{$G.GoValue .Annotations .TypeExpr .Just}}
 }
 {{end}}{{end}}
 {{end}}
 {{end}}
 
-{{define "unionParams"}}{{$decl := .}}
-{{$name := .Name | .G.GoEscape | public}}
+{{define "decl_Union"}}{{$decl := $P}}{{$G := $decl.G}}
+{{$name := $decl.Name | $G.GoEscape | public}}
 type {{$name}}{{$decl.TypeParams.LSide}} struct {
 	Branch {{$name}}Branch{{$decl.TypeParams.RSide}}
 }
@@ -72,24 +74,24 @@ type {{$name}}Branch{{$decl.TypeParams.LSide}} interface {
 	is{{$name}}Branch()
 }
 
-func (*{{$name}}{{.TypeParams.RSide}}) MakeNewBranch(key string) (any, error) {
+func (*{{$name}}{{$decl.TypeParams.RSide}}) MakeNewBranch(key string) (any, error) {
 	switch key {
-	{{range .Branches -}}{{$type := .G.GoType .TypeExpr .Annotations}}case "{{.SerializedName}}":
+	{{range $decl.Branches -}}{{$type := $G.GoType .TypeExpr .Annotations}}case "{{.SerializedName}}":
 		return &_{{$name}}_{{.Name | public}}{{$type.UnionTypeParams.RSide}}{}, nil
 	{{end}}}
-	return nil, {{.G.GoImport "fmt"}}Errorf("unknown branch is : %s", key)
+	return nil, {{$G.GoImport "fmt"}}Errorf("unknown branch is : %s", key)
 }
 
-{{range .Branches -}}{{$type := .G.GoType .TypeExpr .Annotations}}
+{{range $decl.Branches -}}{{$type := $G.GoType .TypeExpr .Annotations}}
 type _{{$name}}_{{.Name | public}}{{$type.UnionTypeParams.LSide}} struct {
 	V {{$type}} `branch:"{{.Name}}"`
 }{{end}}
 
-{{range .Branches -}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+{{range $decl.Branches -}}{{$Type := $G.GoType .TypeExpr .Annotations}}
 func (_{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}}) is{{$name}}Branch() {}
 {{- end}}
 
-{{range .Branches -}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+{{range $decl.Branches -}}{{$Type := $G.GoType .TypeExpr .Annotations}}
 {{if .IsVoid -}}
 func Make_{{$name}}_{{.Name}}{{$decl.TypeParams.LSide}}() {{$name}}{{$decl.TypeParams.RSide}} {
 	return {{$name}}{{$decl.TypeParams.RSide}}{
@@ -105,22 +107,22 @@ func Make_{{$name}}_{{.Name}}{{$decl.TypeParams.LSide}}(v {{$Type}}) {{$name}}{{
 {{- end}}
 {{end}}
 
-{{range .Branches -}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+{{range $decl.Branches -}}{{$Type := $G.GoType .TypeExpr .Annotations}}
 func (un {{$name}}{{$decl.TypeParams.RSide}})Cast_{{.Name}}() ({{$Type}}, bool) {
 	br, ok := un.Branch.(_{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}})
 	return br.V, ok
 }
 {{end}}
 
-{{$htp := .TypeParams.AddParam "T"}}
+{{$htp := $decl.TypeParams.AddParam "T"}}
 
 func Handle_{{$name}}{{$htp.LSide}}(
-	_in {{$name}}{{.TypeParams.RSide}},{{range .Branches}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+	_in {{$name}}{{$decl.TypeParams.RSide}},{{range $decl.Branches}}{{$Type := $G.GoType .TypeExpr .Annotations}}
 	{{.Name}} func({{.Name}} {{$Type}}) ({{$htp.Last}}),{{end}}
 	_default func() {{$htp.Last}},
 ) ({{$htp.Last}}) {
 	switch _b := _in.Branch.(type) {
-	{{range .Branches -}}{{- $Type := .G.GoType .TypeExpr .Annotations -}}
+	{{range $decl.Branches -}}{{- $Type := $G.GoType .TypeExpr .Annotations -}}
 	case _{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}}:
 		if {{.Name}} != nil {
 			return {{.Name}}(_b.V)
@@ -133,12 +135,12 @@ func Handle_{{$name}}{{$htp.LSide}}(
 }
 
 func HandleWithErr_{{$name}}{{$htp.LSide}}(
-	_in {{$name}}{{.TypeParams.RSide}},{{range .Branches}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+	_in {{$name}}{{$decl.TypeParams.RSide}},{{range $decl.Branches}}{{$Type := $G.GoType .TypeExpr .Annotations}}
 	{{.Name}} func({{.Name}} {{$Type}}) ({{$htp.Last}}, error),{{end}}
 	_default func() ({{$htp.Last}}, error),
 ) ({{$htp.Last}}, error) {
 	switch _b := _in.Branch.(type) {
-	{{range .Branches -}}{{$Type := .G.GoType .TypeExpr .Annotations -}}
+	{{range $decl.Branches -}}{{$Type := $G.GoType .TypeExpr .Annotations -}}
 	case _{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}}:
 		if {{.Name}} != nil {
 			return {{.Name}}(_b.V)
@@ -151,12 +153,12 @@ func HandleWithErr_{{$name}}{{$htp.LSide}}(
 }
 {{end}}
 
-{{define "typeAliasParams"}}{{$G := .G}}
-type {{.Name|public}}{{.TypeParams.LSide}} = {{$G.GoType .TypeExpr .Annotations}}
+{{define "decl_TypeDef"}}{{$G := $P.G}}
+type {{$P.Name|public}}{{$P.TypeParams.LSide}} = {{$G.GoType .TypeExpr $P.Annotations}}
 {{end}}
 
-{{define "newTypeParams"}}{{$G := .G}}
-type {{.Name|public}}{{.TypeParams.LSide}} {{$G.GoType .TypeExpr .Annotations}}
+{{define "decl_NewType"}}{{$G := $P.G}}
+type {{$P.Name|public}}{{$P.TypeParams.LSide}} {{$G.GoType .TypeExpr $P.Annotations}}
 {{end}}
 
 {{/* ---------- ast registration ---------- */}}

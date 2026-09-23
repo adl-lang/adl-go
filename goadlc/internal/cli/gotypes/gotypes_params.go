@@ -21,42 +21,39 @@ type aTexprParams struct {
 	TypeParams gogen.TypeParam
 }
 
-type structParams struct {
+// declParams renders one ADL decl. The template dispatches on the decl's
+// DeclType branch via tmpl_by_type, so the struct/union/alias/newtype split
+// lives in the templates rather than in a Handle_DeclType ladder here.
+type declParams struct {
 	G          *gogen.Generator
+	Decl       adlast.Decl
 	Name       string
 	TypeParams gogen.TypeParam
-	Fields     []fieldParams
+}
+
+func (p declParams) Annotations() adlast.Annotations {
+	return p.Decl.Annotations
+}
+
+// Fields are the struct branch's fields, decorated for the templates.
+func (p declParams) Fields() []gogen.Field {
+	struct_, _ := p.Decl.Type_.Cast_struct_()
+	return gogen.WrapFields(struct_.Fields)
+}
+
+// Branches are the union branch's fields, decorated for the templates.
+func (p declParams) Branches() []gogen.Field {
+	union_, _ := p.Decl.Type_.Cast_union_()
+	return gogen.WrapFields(union_.Fields)
 }
 
 // ContainsTypeToken reports whether any field of the struct is a TypeToken.
 // Structs that contain one get no Make_ funcs generated.
-func (p structParams) ContainsTypeToken() bool {
-	for _, f := range p.Fields {
+func (p declParams) ContainsTypeToken() bool {
+	for _, f := range p.Fields() {
 		if f.IsTypeToken() {
 			return true
 		}
 	}
 	return false
 }
-
-type unionParams struct {
-	G          *gogen.Generator
-	Name       string
-	TypeParams gogen.TypeParam
-	Branches   []fieldParams
-}
-
-type fieldParams struct {
-	gogen.Field
-	DeclName string
-	G        *gogen.Generator
-}
-
-type typeAliasParams struct {
-	G           *gogen.Generator
-	Name        string
-	TypeParams  gogen.TypeParam
-	TypeExpr    adlast.TypeExpr
-	Annotations adlast.Annotations
-}
-type newTypeParams typeAliasParams
