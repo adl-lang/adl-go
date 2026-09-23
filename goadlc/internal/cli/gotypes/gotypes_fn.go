@@ -8,7 +8,6 @@ import (
 
 	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
-	"github.com/adl-lang/adl-go/adl/sys/types"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gogen"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gomod"
@@ -177,7 +176,6 @@ func generalDeclV3(
 				Fields: lo.Map(s.Fields, func(f adlast.Field, _ int) fieldParams {
 					return makeFieldParam(f, decl.Name, in)
 				}),
-				ContainsTypeToken: containsTypeToken(s),
 			})
 			return nil
 		},
@@ -281,42 +279,9 @@ func makeFieldParam(
 	declName string,
 	gen *gogen.Generator,
 ) fieldParams {
-	isVoid := false
-	if pr, ok := f.TypeExpr.TypeRef.Cast_primitive(); ok {
-		if pr == "Void" {
-			isVoid = true
-		}
+	return fieldParams{
+		Field:    gogen.Field{Field: f},
+		DeclName: declName,
+		G:        gen,
 	}
-	return types.Handle_Maybe[any, fieldParams](
-		f.Default,
-		func(nothing struct{}) fieldParams {
-			return fieldParams{
-				Field:      f,
-				DeclName:   declName,
-				G:          gen,
-				HasDefault: false,
-				IsVoid:     isVoid,
-			}
-		},
-		func(just any) fieldParams {
-			return fieldParams{
-				Field:      f,
-				DeclName:   declName,
-				G:          gen,
-				HasDefault: true,
-				Just:       just,
-				IsVoid:     isVoid,
-			}
-		},
-		nil,
-	)
-}
-
-func containsTypeToken(str adlast.Struct) bool {
-	for _, fld := range str.Fields {
-		if pr, ok := fld.TypeExpr.TypeRef.Cast_primitive(); ok && pr == "TypeToken" {
-			return true
-		}
-	}
-	return false
 }

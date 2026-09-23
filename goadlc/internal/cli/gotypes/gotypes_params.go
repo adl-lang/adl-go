@@ -22,11 +22,21 @@ type aTexprParams struct {
 }
 
 type structParams struct {
-	G                 *gogen.Generator
-	Name              string
-	TypeParams        gogen.TypeParam
-	Fields            []fieldParams
-	ContainsTypeToken bool
+	G          *gogen.Generator
+	Name       string
+	TypeParams gogen.TypeParam
+	Fields     []fieldParams
+}
+
+// ContainsTypeToken reports whether any field of the struct is a TypeToken.
+// Structs that contain one get no Make_ funcs generated.
+func (p structParams) ContainsTypeToken() bool {
+	for _, f := range p.Fields {
+		if f.IsTypeToken() {
+			return true
+		}
+	}
+	return false
 }
 
 type unionParams struct {
@@ -37,12 +47,9 @@ type unionParams struct {
 }
 
 type fieldParams struct {
-	adlast.Field
-	DeclName   string
-	G          *gogen.Generator
-	HasDefault bool
-	Just       any
-	IsVoid     bool
+	gogen.Field
+	DeclName string
+	G        *gogen.Generator
 }
 
 type typeAliasParams struct {
