@@ -45,30 +45,6 @@ package {{.Pkg}}
 
 {{define "texpr_TypeRef_TypeParam"}}{{panic "typeParm not valid in mono te"}}{{end}}
 
-{{/* ---------- primitive values ---------- */}}
-
-{{define "primParams"}}{{$n := .Tmpl}}{{template $n .}}{{end}}
-
-{{define "prim_number"}}{{.Val}}{{end}}
-
-{{define "prim_String"}}{{.JSON}}{{end}}
-
-{{define "prim_Void"}}struct{}{}{{end}}
-
-{{define "prim_Json"}}{{if .IsNil}}nil{{else}}{{.GoSyntax}}{{end}}{{end}}
-
-{{define "prim_TypeToken"}}{{.AdlastPkg}}Make_ATypeExpr[{{.ElemGoType}}]({{.ElemTexpr}}){{end}}
-
-{{define "prim_Nullable"}}{{if .IsNil}}nil{{else}}{{.AdlPkg}}Addr({{.ElemValue}}){{end}}{{end}}
-
-{{define "prim_Vector"}}{{$e := .ElemGoType}}{{$vs := .Elems}}{{if not $vs}}[]{{$e}}{}{{else}}[]{{$e}}{
-{{range $vs}}{{.}},
-{{end}}}{{end}}{{end}}
-
-{{define "prim_StringMap"}}{{$e := .ElemGoType}}{{$es := .Entries}}{{if not $es}}map[string]{{$e}}{}{{else}}map[string]{{$e}}{
-{{range $es}}"{{.K}}" : {{.V}},
-{{end}}}{{end}}{{end}}
-
 {{/* ---------- generated-constructor calls ---------- */}}
 
 {{define "ctorParams"}}{{.Ctor}}({{if .Args}}

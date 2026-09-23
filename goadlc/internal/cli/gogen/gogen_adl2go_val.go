@@ -399,108 +399,6 @@ func (bg *goval_gen) goUnion(
 	// return fmt.Sprintf("%s{\nBranch: %s,\n}", gt.String(), strings.Join(ret, ",\n"))
 }
 
-func (bg *goval_gen) goValuePrimitive(
-	anns adlast.Annotations,
-	te adlast.TypeExpr,
-	primitive string,
-	val any,
-) string {
-	return RenderString(primParams{g: bg, Prim: primitive, Anns: anns, Te: te, Val: val})
-}
-
-// primParams renders a primitive value. The template picks its case by
-// primitive name, via gotmpl's dynamic template names.
-type primParams struct {
-	g    *goval_gen
-	Prim string
-	Anns adlast.Annotations
-	Te   adlast.TypeExpr
-	Val  any
-}
-
-var primTmpl = map[string]string{
-	"Int8": "prim_number", "Int16": "prim_number",
-	"Int32": "prim_number", "Int64": "prim_number",
-	"Word8": "prim_number", "Word16": "prim_number",
-	"Word32": "prim_number", "Word64": "prim_number",
-	"Bool": "prim_number", "Float": "prim_number", "Double": "prim_number",
-	// "ByteVector" is not handled.
-	"TypeToken": "prim_TypeToken",
-	"String":    "prim_String",
-	"Void":      "prim_Void",
-	"Json":      "prim_Json",
-	"Vector":    "prim_Vector",
-	"StringMap": "prim_StringMap",
-	"Nullable":  "prim_Nullable",
-}
-
-// Tmpl names the template that renders this primitive.
-func (p primParams) Tmpl() string {
-	name, ok := primTmpl[p.Prim]
-	if !ok {
-		panic("Unknown GoValuePrimitive")
-	}
-	return name
-}
-
-func (p primParams) IsNil() bool { return p.Val == nil }
-
-// JSON is the value as a JSON literal, which doubles as its Go literal.
-func (p primParams) JSON() string {
-	by, _ := json.Marshal(p.Val)
-	return string(by)
-}
-
-// GoSyntax is the value in Go-syntax representation.
-func (p primParams) GoSyntax() string { return fmt.Sprintf("%+#v", p.Val) }
-
-func (p primParams) elemTe() adlast.TypeExpr { return p.Te.Parameters[0] }
-
-// ElemGoType is the Go type of the first type parameter.
-func (p primParams) ElemGoType() goTypeExpr { return p.g.GoType(p.elemTe(), p.Anns) }
-
-// ElemValue renders the value at the element type.
-func (p primParams) ElemValue() string { return p.g.goValue(p.Anns, p.elemTe(), p.Val) }
-
-// ElemTexpr is the Go source reconstructing the element TypeExpr.
-func (p primParams) ElemTexpr() string { return p.g.GoTexprValue(p.elemTe(), p.Anns) }
-
-// Elems renders each element of a Vector.
-func (p primParams) Elems() []string {
-	rv := reflect.ValueOf(p.Val)
-	out := make([]string, rv.Len())
-	for i := range out {
-		p.g.path = append(p.g.path, fmt.Sprintf("[%d]", i))
-		out[i] = p.g.goValue(p.Anns, p.elemTe(), rv.Index(i).Interface())
-	}
-	return out
-}
-
-// Entries renders the entries of a StringMap, sorted by key so that the
-// generated code is deterministic.
-func (p primParams) Entries() kvBy {
-	m := p.Val.(map[string]any)
-	out := make(kvBy, 0, len(m))
-	for k, v := range m {
-		out = append(out, kv{k, p.g.goValue(p.Anns, p.elemTe(), v)})
-	}
-	sort.Sort(out)
-	return out
-}
-
-func (p primParams) AdlastPkg() string {
-	pkg, err := p.g.Cli.GoImport("adlast", p.g.ModuleName, &p.g.Imports)
-	if err != nil {
-		panic(err)
-	}
-	return pkg
-}
-
-func (p primParams) AdlPkg() string {
-	pkg, _ := p.g.Cli.GoImport("adl", p.g.ModuleName, &p.g.Imports)
-	return pkg
-}
-
 // ctorParams renders a call to a generated constructor: MakeAll_X for a
 // struct, Make_X_branch for a union, or a newtype conversion. No args
 // renders as "()"; otherwise each arg goes on its own line.
@@ -536,13 +434,95 @@ func qualify(pkg string) string {
 	return pkg + "."
 }
 
+func (bg *goval_gen) goValuePrimitive(
+	anns adlast.Annotations,
+	te adlast.TypeExpr,
+	primitive string,
+	val any,
+) string {
+	// if val == nil {
+	// 	panic(fmt.Errorf("!!! primitive: %v %+#v", primitive, te))
+	// }
+	switch primitive {
+	case "TypeToken":
+		pkg, err := bg.Cli.GoImport("adlast", bg.ModuleName, &bg.Imports)
+		if err != nil {
+			panic(err)
+		}
+		// return bg.GoTexprValue(te.Parameters[0], anns)
+		gt := bg.GoType(te.Parameters[0], anns)
+		return fmt.Sprintf("%sMake_ATypeExpr[%s](%s)", pkg, gt, bg.GoTexprValue(te.Parameters[0], anns))
+	case "Int8", "Int16", "Int32", "Int64",
+		"Word8", "Word16", "Word32", "Word64",
+		"Bool", "Float", "Double":
+		return fmt.Sprintf("%v", val)
+	case "String":
+		by, _ := json.Marshal(val)
+		return string(by)
+	// case "ByteVector":
+	case "Void":
+		return "struct{}{}"
+	case "Json":
+		//TODO write custom any -> go val func
+		if val == nil {
+			return "nil"
+		}
+		return fmt.Sprintf("%+#v", val)
+	case "Vector":
+		rv := reflect.ValueOf(val)
+		vs := make([]string, rv.Len())
+		for i := 0; i < rv.Len(); i++ {
+			bg.path = append(bg.path, fmt.Sprintf("[%d]", i))
+			v := rv.Index(i)
+			vs[i] = bg.goValue(anns, te.Parameters[0], v.Interface())
+		}
+		if len(vs) == 0 {
+			return fmt.Sprintf("[]%s{}", bg.GoType(te.Parameters[0], anns))
+		}
+		vss := strings.Join(vs, ",\n")
+		return fmt.Sprintf("[]%s{\n%s,\n}", bg.GoType(te.Parameters[0], anns), vss)
+	case "StringMap":
+		m := val.(map[string]any)
+		vs := make(kvBy, 0, len(m))
+		for k, v := range m {
+			vs = append(vs, kv{k, bg.goValue(anns, te.Parameters[0], v)})
+		}
+		if len(vs) == 0 {
+			return fmt.Sprintf("map[string]%s{}", bg.GoType(te.Parameters[0], anns))
+		}
+		sort.Sort(vs)
+		return fmt.Sprintf("map[string]%s{\n%s,\n}", bg.GoType(te.Parameters[0], anns), vs)
+	case "Nullable":
+		if val == nil {
+			return "nil"
+		}
+		gl, _ := bg.Cli.GoImport("adl", bg.ModuleName, &bg.Imports)
+		return gl + "Addr(" + bg.goValue(anns, te.Parameters[0], val) + ")"
+	}
+	panic("Unknown GoValuePrimitive")
+}
+
 type kv struct {
-	K string
-	V string
+	k string
+	v string
 }
 
 type kvBy []kv
 
+func (kv kv) String() string {
+	return fmt.Sprintf(`"%s" : %s`, kv.k, kv.v)
+}
+func (elems kvBy) String() string {
+	var b strings.Builder
+	// b.Grow(n)
+	b.WriteString(elems[0].String())
+	for _, s := range elems[1:] {
+		b.WriteString(",\n")
+		b.WriteString(s.String())
+	}
+	return b.String()
+}
+
 func (a kvBy) Len() int           { return len(a) }
 func (a kvBy) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a kvBy) Less(i, j int) bool { return a[i].K < a[j].K }
+func (a kvBy) Less(i, j int) bool { return a[i].k < a[j].k }
