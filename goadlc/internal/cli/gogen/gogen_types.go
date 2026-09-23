@@ -34,7 +34,6 @@ type BaseGen struct {
 
 type Generator struct {
 	*BaseGen
-	Rr TemplateRenderer
 }
 
 // // sign used by templates
@@ -101,29 +100,15 @@ func NewBaseGen(
 	}
 }
 
-// TemplateRenderer accumulates the body of one generated file.
-type TemplateRenderer struct {
-	Buf bytes.Buffer
-}
-
-// Render appends params, rendered by the template named after its Go type,
-// to the buffer. The "render" template does the dispatch with gotmpl's
-// tmpl_by_type, so an xxxParams value is rendered by {{define "xxxParams"}}.
-func (tr *TemplateRenderer) Render(params any) {
-	var err error
-	if err = templates.Gen.ExecuteTemplate(&tr.Buf, "render", params); err != nil {
-		renderPanic(params, err)
-	}
-}
-
-// RenderString renders params to a string, for callers that need a value
-// rather than an append to the file being accumulated.
-func RenderString(params any) string {
+// RenderString renders params with the named template, for callers that
+// need a value rather than a piece of the file being written. Whole files go
+// through WriteFile and the "file" template instead.
+func RenderString(tmpl string, params any) string {
 	var (
 		buf bytes.Buffer
 		err error
 	)
-	if err = templates.Gen.ExecuteTemplate(&buf, "render", params); err != nil {
+	if err = templates.Gen.ExecuteTemplate(&buf, tmpl, params); err != nil {
 		renderPanic(params, err)
 	}
 	return buf.String()
@@ -133,9 +118,4 @@ func renderPanic(params any, err error) {
 	data, _ := json.Marshal(params)
 	fmt.Fprintf(os.Stderr, "error executing template -- type: %T\nerror: %v\n%s", params, err, string(data))
 	panic(err)
-}
-
-// Bytes returns the accumulated bytes.
-func (tr *TemplateRenderer) Bytes() []byte {
-	return tr.Buf.Bytes()
 }

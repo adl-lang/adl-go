@@ -10,6 +10,9 @@ type serviceParams struct {
 	Name       string
 	TypeParams gogen.TypeParam
 	IsCap      bool
+	// Methods are postParams / getParams / getcapapiParams / getapiParams;
+	// the template dispatches on each one's type.
+	Methods []any
 }
 
 type registerParams struct {
@@ -21,6 +24,8 @@ type registerParams struct {
 	Annotations adlast.Annotations
 	V           *adlast.TypeExpr
 	CapApis     []tkid
+	// Regs are regpostParams / reggetParams / regcapapiParams / regapiParams.
+	Regs []any
 }
 
 type postParams struct {

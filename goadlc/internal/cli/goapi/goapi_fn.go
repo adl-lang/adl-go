@@ -38,10 +38,7 @@ func (in *GoApi) Run() error {
 		in,
 		*in.Loader,
 	)
-	body := &gogen.Generator{
-		BaseGen: base,
-		Rr:      gogen.TemplateRenderer{},
-	}
+	body := &gogen.Generator{BaseGen: base}
 	apis := &apiInstance{
 		Struct:     ExpandStruct(in.Loader, st),
 		ScopedName: in.ApiStruct,
@@ -53,18 +50,22 @@ func (in *GoApi) Run() error {
 	if err != nil {
 		return err
 	}
+	apis0s := []srvApiParams{}
 	for _, apis0 := range result0 {
-		in.genInterface(body, apis0)
-		in.genRegister(body, apis0)
+		apis0s = append(apis0s, srvApiParams{
+			Service:  in.makeServiceParams(body, apis0),
+			Register: in.makeRegisterParams(body, apis0),
+		})
 	}
 	modCodeGenDir := strings.Split(in.ApiStruct.ModuleName, ".")
 	modCodeGenPkg := modCodeGenDir[len(modCodeGenDir)-1]
 	path := fp.Join(fp.Join(in.Outputdir, fp.Join(modCodeGenDir...)), modCodeGenPkg+"_srv.go")
-	err = body.WriteFile(in.Root, modCodeGenPkg, path, false, []goimports.ImportSpec{})
-	if err != nil {
-		return err
-	}
-	return nil
+	return gogen.WriteFile(in.Root, path, false, &gogen.FileParams{
+		Pkg:      modCodeGenPkg,
+		G:        body,
+		BodyTmpl: "goapi_srv_body",
+		BodyData: srvBodyParams{Apis: apis0s},
+	})
 }
 
 var reservedNames = []string{"C", "c", "S", "s", "V", "v"}
@@ -164,32 +165,43 @@ func (in *GoApi) transKids(path string, apiSt *adlast.Struct) []tkid {
 	})
 }
 
+// srvBodyParams is the body of a module's _srv.go file: each api's service
+// interface followed by its register func.
+type srvBodyParams struct {
+	Apis []srvApiParams
+}
+
+type srvApiParams struct {
+	Service  serviceParams
+	Register registerParams
+}
+
 type apiInstance struct {
 	Struct     adlast.Struct
 	ScopedName adlast.ScopedName
 	Field      *adlast.Field
 }
 
-func (in *GoApi) genInterface(
+func (in *GoApi) makeServiceParams(
 	body *gogen.Generator,
 	inst *apiInstance,
-) {
+) serviceParams {
 	tps := gogen.TypeParam{}
 	if inst.Field != nil {
 		tps = tps.AddParams("C", "S")
 		tps = tps.AddParams(inst.Struct.TypeParams...)
 	}
-	body.Rr.Render(serviceParams{
+	svc := serviceParams{
 		G:          body,
 		Name:       inst.ScopedName.Name,
 		TypeParams: tps,
 		IsCap:      inst.Field != nil,
-	})
+	}
 	for _, fi := range inst.Struct.Fields {
 		if ref, ok := fi.TypeExpr.TypeRef.Cast_reference(); ok {
 			switch ref.Name {
 			case "HttpPost":
-				body.Rr.Render(postParams{
+				svc.Methods = append(svc.Methods, postParams{
 					G:           body,
 					Name:        fi.Name,
 					Annotations: fi.Annotations,
@@ -198,7 +210,7 @@ func (in *GoApi) genInterface(
 					IsCap:       inst.Field != nil,
 				})
 			case "HttpGet":
-				body.Rr.Render(getParams{
+				svc.Methods = append(svc.Methods, getParams{
 					G:           body,
 					Name:        fi.Name,
 					Annotations: fi.Annotations,
@@ -208,7 +220,7 @@ func (in *GoApi) genInterface(
 			case "CapabilityApi":
 				apiTe := fi.TypeExpr.Parameters[2]
 				apiRef, _ := apiTe.TypeRef.Cast_reference()
-				body.Rr.Render(getcapapiParams{
+				svc.Methods = append(svc.Methods, getcapapiParams{
 					G:           body,
 					Name:        fi.Name,
 					StructName:  apiRef.Name,
@@ -220,7 +232,7 @@ func (in *GoApi) genInterface(
 			default:
 				rd, _ := body.Resolver(ref)
 				if _, ok := rd.Type_.Cast_struct_(); ok {
-					body.Rr.Render(getapiParams{
+					svc.Methods = append(svc.Methods, getapiParams{
 						G:           body,
 						Name:        fi.Name,
 						StructName:  ref.Name,
@@ -232,13 +244,13 @@ func (in *GoApi) genInterface(
 		}
 
 	}
-	body.Rr.Buf.WriteString("}\n")
+	return svc
 }
 
-func (in *GoApi) genRegister(
+func (in *GoApi) makeRegisterParams(
 	body *gogen.Generator,
 	inst *apiInstance,
-) error {
+) registerParams {
 	ann := customtypes.MapMap[adlast.ScopedName, any]{}
 	var (
 		vte *adlast.TypeExpr
@@ -258,7 +270,7 @@ func (in *GoApi) genRegister(
 		tps = tps.AddParams(inst.Struct.TypeParams...)
 	}
 	tkids := in.transKids("", &inst.Struct)
-	body.Rr.Render(registerParams{
+	reg := registerParams{
 		G:           body,
 		CapModule:   "common.capability",
 		Name:        inst.ScopedName.Name,
@@ -267,19 +279,19 @@ func (in *GoApi) genRegister(
 		V:           vte,
 		Annotations: ann,
 		CapApis:     tkids,
-	})
+	}
 	for _, fi := range inst.Struct.Fields {
 		if ref, ok := fi.TypeExpr.TypeRef.Cast_reference(); ok {
 			switch ref.Name {
 			case "HttpPost":
-				body.Rr.Render(regpostParams{
+				reg.Regs = append(reg.Regs, regpostParams{
 					G:      body,
 					Module: ref.ModuleName,
 					Name:   fi.Name,
 					IsCap:  inst.Field != nil,
 				})
 			case "HttpGet":
-				body.Rr.Render(reggetParams{
+				reg.Regs = append(reg.Regs, reggetParams{
 					G:      body,
 					Module: ref.ModuleName,
 					Name:   fi.Name,
@@ -292,7 +304,7 @@ func (in *GoApi) genRegister(
 				capSt, _ := decl.Type_.Cast_struct_()
 				tkid := []tkid{{fi.Name, &fi}}
 				tkid = append(tkid, in.transKids(fi.Name+"_", &capSt)...)
-				body.Rr.Render(regcapapiParams{
+				reg.Regs = append(reg.Regs, regcapapiParams{
 					G:          body,
 					StructName: apiRef.Name,
 					Module:     ref.ModuleName,
@@ -302,7 +314,7 @@ func (in *GoApi) genRegister(
 			default:
 				rd, _ := body.Resolver(ref)
 				if _, ok := rd.Type_.Cast_struct_(); ok {
-					body.Rr.Render(regapiParams{
+					reg.Regs = append(reg.Regs, regapiParams{
 						G:          body,
 						StructName: ref.Name,
 						Module:     ref.ModuleName,
@@ -312,8 +324,7 @@ func (in *GoApi) genRegister(
 			}
 		}
 	}
-	body.Rr.Buf.WriteString("}\n")
-	return nil
+	return reg
 }
 
 func (in *GoApi) ReservedImports() []goimports.ImportSpec {

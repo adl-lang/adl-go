@@ -160,7 +160,7 @@ func (bg *goval_gen) goValue(
 				},
 				func(newtype_ adlast.NewType) string {
 					monoTe, _ := adl.SubstituteTypeBindings(tbind, newtype_.TypeExpr)
-					return RenderString(ctorParams{
+					return RenderString("ctorParams", ctorParams{
 						Ctor: gt.String(),
 						Args: []string{bg.goValue(decl.Annotations, monoTe, val)},
 					})
@@ -208,7 +208,7 @@ func (bg *Generator) goCustomType(
 		}
 		bg.Imports.AddSpec(spec)
 	}
-	return RenderString(custTypeConstructionParams{
+	return RenderString("custTypeConstructionParams", custTypeConstructionParams{
 		G:                bg,
 		Name:             decl.Name,
 		ModuleName:       bg.ModuleName,
@@ -223,7 +223,7 @@ func (bg *Generator) goCustomType(
 // strRep renders a TypeExpr as the Go source that reconstructs it.
 func (bg *Generator) strRep(te adlast.TypeExpr) string {
 	bg.Cli.GoImport("adlast", bg.ModuleName, &bg.Imports)
-	return RenderString(texprParams{G: bg, Te: te})
+	return RenderString("texprParams", texprParams{G: bg, Te: te})
 }
 
 // texprParams renders one TypeExpr; the template recurses over Params.
@@ -272,11 +272,11 @@ func (bg *goval_gen) goStruct(
 				mn := k["moduleName"]
 				na := k["name"]
 				//TODO write custom any -> go val func
-				annvs = append(annvs, RenderString(annEntryParams{ModuleName: mn, Name: na, Val: v}))
+				annvs = append(annvs, RenderString("annEntryParams", annEntryParams{ModuleName: mn, Name: na, Val: v}))
 			}
 			// sort so there is a determistic order for generated AST code
 			sort.Strings(annvs)
-			ret = append(ret, RenderString(annMapParams{Entries: annvs}))
+			ret = append(ret, RenderString("annMapParams", annMapParams{Entries: annvs}))
 			return ret
 		}
 		if v, ok := mval[fld.SerializedName]; ok {
@@ -309,7 +309,7 @@ func (bg *goval_gen) goStruct(
 		}
 		return ret
 	})
-	return RenderString(ctorParams{
+	return RenderString("ctorParams", ctorParams{
 		Ctor: qualify(gt.Pkg) + "MakeAll_" + gt.Type + gt.TypeParams.RSide(),
 		Args: ret,
 	})
@@ -385,7 +385,7 @@ func (bg *goval_gen) goUnion(
 	if pr, isPrim := fld.TypeExpr.TypeRef.Cast_primitive(); !isPrim || pr != "Void" {
 		ctor.Args = []string{bg.goValue(fld.Annotations, monoTe, v)}
 	}
-	return RenderString(ctor)
+	return RenderString("ctorParams", ctor)
 
 	// ret := []string{
 	// 	fmt.Sprintf("%s%s_%s%s{\nV: %v}",

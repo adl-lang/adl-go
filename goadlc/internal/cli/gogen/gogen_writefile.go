@@ -1,25 +1,26 @@
 package gogen
 
 import (
+	"bytes"
 	"fmt"
 	"go/format"
 	"os"
 	"path/filepath"
 
-	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/root"
+	"github.com/adl-lang/adl-go/goadlc/internal/cli/templates"
 )
 
-func (in *Generator) WriteFile(
+// WriteFile renders one generated file from the single "file" template and
+// writes it to path, gofmt'd unless noGoFmt.
+func WriteFile(
 	rt *root.Root,
-	modCodeGenPkg string,
 	path string,
 	noGoFmt bool,
-	specialImports []goimports.ImportSpec,
+	file *FileParams,
 ) error {
 	var err error
-	dir, file := filepath.Split(path)
-	_ = file
+	dir, _ := filepath.Split(path)
 
 	if d, err := os.Stat(dir); err != nil {
 		err = os.MkdirAll(dir, os.ModePerm)
@@ -32,26 +33,11 @@ func (in *Generator) WriteFile(
 		}
 	}
 
-	header := &Generator{
-		BaseGen: in.BaseGen,
-		Rr:      TemplateRenderer{},
+	var buf bytes.Buffer
+	if err = templates.Gen.ExecuteTemplate(&buf, "file", file); err != nil {
+		renderPanic(file.BodyData, err)
 	}
-	header.Rr.Render(headerParams{
-		Pkg: modCodeGenPkg,
-	})
-	useImports := []goimports.ImportSpec{}
-	for _, spec := range in.Imports.Specs {
-		if in.Imports.Used[spec.Path] {
-			useImports = append(useImports, spec)
-		}
-	}
-	useImports = append(useImports, specialImports...)
-
-	header.Rr.Render(importsParams{
-		Imports: useImports,
-	})
-	header.Rr.Buf.Write(in.Rr.Bytes())
-	unformatted := header.Rr.Bytes()
+	unformatted := buf.Bytes()
 
 	var formatted []byte
 	if !noGoFmt {

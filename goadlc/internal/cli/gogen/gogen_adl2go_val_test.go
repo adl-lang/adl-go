@@ -49,7 +49,7 @@ func TestTexprParamsTemplate(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := RenderString(texprParams{Te: tc.te}); got != tc.want {
+			if got := RenderString("texprParams", texprParams{Te: tc.te}); got != tc.want {
 				t.Errorf("got  %s\nwant %s", got, tc.want)
 			}
 		})
@@ -75,7 +75,7 @@ func TestAnnEntryParamsTemplate(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := RenderString(tc.in); got != tc.want {
+			if got := RenderString("annEntryParams", tc.in); got != tc.want {
 				t.Errorf("got  %s\nwant %s", got, tc.want)
 			}
 		})
@@ -93,7 +93,7 @@ func TestAnnMapParamsTemplate(t *testing.T) {
 		{"two", []string{"a", "b"}, `customtypes.MapMap[adlast.ScopedName, any]{a,b}`},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := RenderString(annMapParams{Entries: tc.entries}); got != tc.want {
+			if got := RenderString("annMapParams", annMapParams{Entries: tc.entries}); got != tc.want {
 				t.Errorf("got  %s\nwant %s", got, tc.want)
 			}
 		})
@@ -111,7 +111,7 @@ func TestCtorParamsTemplate(t *testing.T) {
 		{"two args", ctorParams{Ctor: "MakeAll_X", Args: []string{"a", "b"}}, "MakeAll_X(\na,\nb,\n)"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := RenderString(tc.in); got != tc.want {
+			if got := RenderString("ctorParams", tc.in); got != tc.want {
 				t.Errorf("got  %q\nwant %q", got, tc.want)
 			}
 		})

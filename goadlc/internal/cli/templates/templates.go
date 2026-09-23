@@ -3,8 +3,10 @@
 // Every sub-task (gotypes, goapi, ...) renders through this set, so a
 // template defined in one .tmpl file can invoke a template defined in
 // another. Each .tmpl file is a collection of {{define}} blocks named after
-// the Go xxxParams type it renders; "render" dispatches to them by type
-// using gotmpl's tmpl_by_type.
+// the Go xxxParams type it renders.
+//
+// One generated file is one "file" call: see gogen.WriteFile and the
+// per-file body templates it dispatches to.
 package templates
 
 import (
@@ -18,8 +20,7 @@ var (
 	//go:embed *.tmpl
 	tmplFS embed.FS
 
-	// Gen is the parsed template set. Execute "render" against any
-	// xxxParams value to render it.
+	// Gen is the parsed template set.
 	Gen = template.Must(
 		template.
 			New("gen", template.WithDynamicScopedVars()).
@@ -28,6 +29,7 @@ var (
 				"lower":  strings.ToLower,
 				"panic":  func(s string) { panic(s) },
 			}).
+			// SuffixLineNos("", 0, "", "").
 			ParseFS(tmplFS, "*.tmpl"))
 )
 

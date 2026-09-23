@@ -5,9 +5,14 @@ One define per xxxParams type; templates/render dispatches to them
 by Go type name via gotmpl's tmpl_by_type.
 */}}
 
+{{/* ---------- file body ---------- */}}
+
+{{define "goapi_srv_body"}}{{range .Apis}}{{template "serviceParams" .Service}}{{template "registerParams" .Register}}{{end}}{{end}}
+
 {{/* ---------- service interface ---------- */}}
 
 {{define "serviceParams"}}type {{.Name}}_Service{{.TypeParams.LSide}} interface {
+{{range .Methods}}{{tmpl_by_type . "" ""}}{{end}}}
 {{end}}
 
 {{define "getParams"}}	{{.Name | public}}(ctx {{.G.GoImport "context"}}Context{{if .IsCap}}, cp S{{end}}) ({{.G.GoType .Resp .Annotations}}, error)
@@ -39,6 +44,7 @@ func Register_{{.Name}}{{.TypeParams.LSide}}(
 {{- end}}
 ) {
 	{{if .IsCap}}reqs := api.Service{{else}}reqs := Make_{{.Name}}(){{end}}
+{{range .Regs}}{{tmpl_by_type . "" ""}}{{end}}}
 {{end}}
 
 {{define "reggetParams"}}{{- $G := .G -}}

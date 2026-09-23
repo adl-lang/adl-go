@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/adl-lang/adl-go/adl"
+	"github.com/adl-lang/adl-go/adl/adlc/config/go_"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 )
@@ -13,6 +14,30 @@ var GoCustomTypeSN = adlast.Make_ScopedName(
 	"adlc.config.go_",
 	"GoCustomType",
 )
+
+// GoCustomTypeAnn returns the go_custom_type annotation, or nil when the
+// decl carries none.
+func GoCustomTypeAnn(anns adlast.Annotations) *go_.GoCustomType {
+	var (
+		jb  = adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
+		gct *go_.GoCustomType
+		err error
+	)
+	if gct, err = adl.GetAnnotation(anns, GoCustomTypeSN, jb); err != nil {
+		panic(err)
+	}
+	return gct
+}
+
+// GoCustomTypeSpec is the import that referencing the custom type requires.
+func GoCustomTypeSpec(gct *go_.GoCustomType) goimports.ImportSpec {
+	pkg := gct.Gotype.Import_path[strings.LastIndex(gct.Gotype.Import_path, "/")+1:]
+	return goimports.ImportSpec{
+		Path:    gct.Gotype.Import_path,
+		Name:    gct.Gotype.Pkg,
+		Aliased: gct.Gotype.Pkg != pkg,
+	}
+}
 
 func (in *Generator) GoRegisterHelper(moduleName string, decl adlast.Decl) (string, error) {
 	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)

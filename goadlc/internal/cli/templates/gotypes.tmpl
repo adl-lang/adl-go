@@ -5,6 +5,12 @@ One define per xxxParams type; templates/render dispatches to them
 by Go type name via gotmpl's tmpl_by_type.
 */}}
 
+{{/* ---------- file bodies ---------- */}}
+
+{{define "gotypes_decls_body"}}{{range .Decls}}{{template "declParams" .}}{{end}}{{end}}
+
+{{define "gotypes_ast_body"}}{{range .Decls}}{{with .Texpr}}{{template "aTexprParams" .}}{{end}}{{template "scopedDeclParams" .Reg}}{{end}}{{end}}
+
 {{/* ---------- decls ---------- */}}
 
 {{define "declParams"}}{{$P := .}}{{tmpl_by_type .Decl.Type_.Branch.V "decl_" ""}}{{end}}
