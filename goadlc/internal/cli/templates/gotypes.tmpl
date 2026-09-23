@@ -1,0 +1,189 @@
+{{/*
+goadlc gotypes: Go decls generated from an ADL module
+
+One define per xxxParams type; templates/render dispatches to them
+by Go type name via gotmpl's tmpl_by_type.
+*/}}
+
+{{/* ---------- decls ---------- */}}
+
+{{define "structParams"}}{{$decl := .}}
+{{$name := .Name | public}}
+{{$G := .G}}
+type {{$name}}{{$decl.TypeParams.LSide}} struct {
+	_{{$name}}{{$decl.TypeParams.RSide}}
+}
+
+type _{{$name}}{{$decl.TypeParams.LSide}} struct {
+{{range .Fields}}	{{.Name|public}} {{$G.GoType .TypeExpr .Annotations}} `json:"{{.SerializedName}}"`
+{{end -}}
+}
+
+func MakeAll_{{$name}}{{.TypeParams.LSide}}(
+{{range .Fields}}{{if not .IsVoid}}	{{.Name | lower | .G.GoEscape}} {{$G.GoType .TypeExpr .Annotations}},
+{{end}}{{end -}}
+) {{$name}}{{.TypeParams.RSide}} {
+	return {{$name}}{{.TypeParams.RSide}}{
+		_{{$name}}{{.TypeParams.RSide}}{
+{{range .Fields}}
+{{- if .IsVoid -}}
+{{$type := $G.GoType .TypeExpr .Annotations}}			{{.Name | public}}: struct{}{},
+{{- else -}}
+{{$type := $G.GoType .TypeExpr .Annotations}}			{{.Name | public}}: {{.Name | lower | .G.GoEscape}},
+{{- end}}
+{{end}}	},
+		}
+}
+
+{{if .ContainsTypeToken}}
+// struct {{$name}} contains at least one TypeToken, not generating Make_ funcs
+{{else}}
+func Make_{{$name}}{{.TypeParams.LSide}}(
+{{range .Fields}}{{if not .IsVoid}}{{if not .HasDefault}}	{{.Name | lower | .G.GoEscape}} {{$G.GoType .TypeExpr .Annotations}},
+{{end}}{{end}}{{end -}}
+) {{$name}}{{.TypeParams.RSide}} {
+	ret := {{$name}}{{.TypeParams.RSide}}{
+		_{{$name}}{{.TypeParams.RSide}}{
+{{range .Fields}}{{$type := $G.GoType .TypeExpr .Annotations}} {{if not .IsVoid}} {{if not .HasDefault}}		{{.Name | public}}: {{.Name | lower | .G.GoEscape}},
+{{else}}		{{.Name | public}}: ((*{{$name}}{{$decl.TypeParams.RSide}})(nil)).Default_{{.Name}}(),
+{{end}}
+{{- else -}}
+		{{.Name | public}}: struct{}{},
+{{end}}
+{{- end}}	},
+		}
+	return ret
+}
+
+{{range .Fields}}{{$type := $G.GoType .TypeExpr .Annotations}}{{if .HasDefault}}func (*{{$decl.Name}}{{$decl.TypeParams.RSide}}) Default_{{.Name | $G.GoEscape}}() {{$type}} {
+	return {{$G.GoValue .Annotations .TypeExpr .Just}}
+}
+{{end}}{{end}}
+{{end}}
+{{end}}
+
+{{define "unionParams"}}{{$decl := .}}
+{{$name := .Name | .G.GoEscape | public}}
+type {{$name}}{{$decl.TypeParams.LSide}} struct {
+	Branch {{$name}}Branch{{$decl.TypeParams.RSide}}
+}
+
+type {{$name}}Branch{{$decl.TypeParams.LSide}} interface {
+	is{{$name}}Branch()
+}
+
+func (*{{$name}}{{.TypeParams.RSide}}) MakeNewBranch(key string) (any, error) {
+	switch key {
+	{{range .Branches -}}{{$type := .G.GoType .TypeExpr .Annotations}}case "{{.SerializedName}}":
+		return &_{{$name}}_{{.Name | public}}{{$type.UnionTypeParams.RSide}}{}, nil
+	{{end}}}
+	return nil, {{.G.GoImport "fmt"}}Errorf("unknown branch is : %s", key)
+}
+
+{{range .Branches -}}{{$type := .G.GoType .TypeExpr .Annotations}}
+type _{{$name}}_{{.Name | public}}{{$type.UnionTypeParams.LSide}} struct {
+	V {{$type}} `branch:"{{.Name}}"`
+}{{end}}
+
+{{range .Branches -}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+func (_{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}}) is{{$name}}Branch() {}
+{{- end}}
+
+{{range .Branches -}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+{{if .IsVoid -}}
+func Make_{{$name}}_{{.Name}}{{$decl.TypeParams.LSide}}() {{$name}}{{$decl.TypeParams.RSide}} {
+	return {{$name}}{{$decl.TypeParams.RSide}}{
+		_{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}}{struct{}{}},
+	}
+}
+{{- else -}}
+func Make_{{$name}}_{{.Name}}{{$decl.TypeParams.LSide}}(v {{$Type}}) {{$name}}{{$decl.TypeParams.RSide}} {
+	return {{$name}}{{$decl.TypeParams.RSide}}{
+		_{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}}{v},
+	}
+}
+{{- end}}
+{{end}}
+
+{{range .Branches -}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+func (un {{$name}}{{$decl.TypeParams.RSide}})Cast_{{.Name}}() ({{$Type}}, bool) {
+	br, ok := un.Branch.(_{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}})
+	return br.V, ok
+}
+{{end}}
+
+{{$htp := .TypeParams.AddParam "T"}}
+
+func Handle_{{$name}}{{$htp.LSide}}(
+	_in {{$name}}{{.TypeParams.RSide}},{{range .Branches}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+	{{.Name}} func({{.Name}} {{$Type}}) ({{$htp.Last}}),{{end}}
+	_default func() {{$htp.Last}},
+) ({{$htp.Last}}) {
+	switch _b := _in.Branch.(type) {
+	{{range .Branches -}}{{- $Type := .G.GoType .TypeExpr .Annotations -}}
+	case _{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}}:
+		if {{.Name}} != nil {
+			return {{.Name}}(_b.V)
+		}
+	{{end}}}
+	if _default != nil {
+		return _default()
+	}
+	panic("unhandled branch in : {{$name}}")
+}
+
+func HandleWithErr_{{$name}}{{$htp.LSide}}(
+	_in {{$name}}{{.TypeParams.RSide}},{{range .Branches}}{{$Type := .G.GoType .TypeExpr .Annotations}}
+	{{.Name}} func({{.Name}} {{$Type}}) ({{$htp.Last}}, error),{{end}}
+	_default func() ({{$htp.Last}}, error),
+) ({{$htp.Last}}, error) {
+	switch _b := _in.Branch.(type) {
+	{{range .Branches -}}{{$Type := .G.GoType .TypeExpr .Annotations -}}
+	case _{{$name}}_{{.Name | public}}{{$Type.UnionTypeParams.RSide}}:
+		if {{.Name}} != nil {
+			return {{.Name}}(_b.V)
+		}
+	{{end}}}
+	if _default != nil {
+		return _default()
+	}
+	panic("unhandled branch in : {{$name}}")
+}
+{{end}}
+
+{{define "typeAliasParams"}}{{$G := .G}}
+type {{.Name|public}}{{.TypeParams.LSide}} = {{$G.GoType .TypeExpr .Annotations}}
+{{end}}
+
+{{define "newTypeParams"}}{{$G := .G}}
+type {{.Name|public}}{{.TypeParams.LSide}} {{$G.GoType .TypeExpr .Annotations}}
+{{end}}
+
+{{/* ---------- ast registration ---------- */}}
+
+{{define "aTexprParams"}}{{$G := .G}}
+func Texpr_{{.Name}}{{.TypeParams.LSide}}({{.TypeParams.TexprArgs}}) {{$G.GoImport "adlast"}}ATypeExpr[{{.TypeName}}{{.TypeParams.RSide}}] {
+	te := {{$G.GoImport "adlast"}}Make_TypeExpr(
+		{{$G.GoImport "adlast"}}Make_TypeRef_reference(
+			{{$G.GoImport "adlast"}}Make_ScopedName("{{.ModuleName}}", "{{.Name}}"),
+		),
+		[]{{$G.GoImport "adlast"}}TypeExpr{ {{- .TypeParams.TexprValues -}} },
+	)
+	return {{$G.GoImport "adlast"}}Make_ATypeExpr[{{.TypeName}}{{.TypeParams.RSide}}] (te)
+}
+{{end}}
+
+{{define "scopedDeclParams"}}{{$G := .G}}
+{{$name := .Name | .G.GoEscape | public}}
+func AST_{{$name}}() {{$G.GoImport "adlast"}}ScopedDecl {
+	decl := {{$G.GoDeclValue .Decl}}
+	return {{$G.GoImport "adlast"}}Make_ScopedDecl("{{.ModuleName}}", decl)
+}
+
+func init() {
+	{{$G.GoImport "adl"}}RESOLVER.Register(
+		{{$G.GoImport "adlast"}}Make_ScopedName("{{.ModuleName}}", "{{.Name}}"),
+		AST_{{.Name}}(),
+	)
+	{{$G.GoRegisterHelper .ModuleName .Decl}}}
+{{end}}

@@ -60,11 +60,11 @@ func thunk_gen_module(
 		path := in.Outputdir + "/" + strings.Join(modCodeGenDir, "/")
 		declBody := &gogen.Generator{
 			BaseGen: gogen.NewBaseGen(gm.ModulePath, midPath, m.Name, in, *in.Loader),
-			Rr:      gogen.TemplateRenderer{Tmpl: templates},
+			Rr:      gogen.TemplateRenderer{},
 		}
 		astBody := &gogen.Generator{
 			BaseGen: gogen.NewBaseGen(gm.ModulePath, midPath, m.Name, in, *in.Loader),
-			Rr:      gogen.TemplateRenderer{Tmpl: templates},
+			Rr:      gogen.TemplateRenderer{},
 		}
 		declsNames := []string{}
 		for k := range m.Module_.Decls {

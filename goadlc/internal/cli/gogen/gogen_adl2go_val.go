@@ -190,11 +190,6 @@ func (bg *Generator) goCustomType(
 		bg.Imports.AddSpec(spec)
 	}
 
-	gen := &Generator{
-		BaseGen: bg.BaseGen,
-		Rr:      TemplateRenderer{Tmpl: templates},
-	}
-
 	typeExprStrs := lo.Map[adlast.TypeExpr, string](monoTe.Parameters, func(a adlast.TypeExpr, _ int) string {
 		return bg.strRep(a)
 	})
@@ -210,8 +205,8 @@ func (bg *Generator) goCustomType(
 		}
 		bg.Imports.AddSpec(spec)
 	}
-	gen.Rr.Render(custTypeConstructionParams{
-		G:                gen,
+	return RenderString(custTypeConstructionParams{
+		G:                bg,
 		Name:             decl.Name,
 		ModuleName:       bg.ModuleName,
 		TypeParams:       gt.TypeParams,
@@ -220,7 +215,6 @@ func (bg *Generator) goCustomType(
 		CustomTypeHelper: helperName,
 		TypeExprStrs:     typeExprStrs,
 	})
-	return gen.Rr.Buf.String()
 }
 
 func (bg *Generator) strRep(te adlast.TypeExpr) string {

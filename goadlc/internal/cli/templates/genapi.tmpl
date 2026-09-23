@@ -1,0 +1,68 @@
+{{/*
+goadlc goapi: service interfaces and their http registration
+
+One define per xxxParams type; templates/render dispatches to them
+by Go type name via gotmpl's tmpl_by_type.
+*/}}
+
+{{/* ---------- service interface ---------- */}}
+
+{{define "serviceParams"}}type {{.Name}}_Service{{.TypeParams.LSide}} interface {
+{{end}}
+
+{{define "getParams"}}	{{.Name | public}}(ctx {{.G.GoImport "context"}}Context{{if .IsCap}}, cp S{{end}}) ({{.G.GoType .Resp .Annotations}}, error)
+{{end}}
+
+{{define "postParams"}}	{{.Name | public}}(ctx {{.G.GoImport "context"}}Context{{if .IsCap}}, cp S{{end}}, req {{.G.GoType .Req .Annotations}}) ({{.G.GoType .Resp .Annotations}}, error)
+{{end}}
+
+{{define "getapiParams"}}{{- $G := .G -}}{{- $anns := .Annotations -}}
+	Get{{.Name | public}}() {{.StructName | public}}_Service{{if .Params}}[{{range .Params}}, {{$G.GoType . $anns}}{{end}}]{{end}}
+{{end}}
+
+{{define "getcapapiParams"}}{{- $G := .G -}}{{- $anns := .Annotations -}}
+	Get{{.Name | public}}() {{.StructName | public}}_Service[{{.G.GoType .C .Annotations}}, {{.G.GoType .S .Annotations}}{{range .Params}}, {{$G.GoType . $anns}}{{end}}]
+{{end}}
+
+{{/* ---------- http registration ---------- */}}
+
+{{define "registerParams"}}{{- $G := .G -}}{{- $CapModule := .CapModule -}}
+func Register_{{.Name}}{{.TypeParams.LSide}}(
+	mux *{{.G.GoImport "http"}}ServeMux,
+	srv {{.Name}}_Service{{.TypeParams.RSide}},
+{{- if .IsCap}}
+	api capability.CapabilityApi[C, S, {{$G.GoType .V .Annotations}}],
+	capr capability.CapabilityRetriever[C, S],
+{{- end}}
+{{- range .CapApis}}{{$C := index .Field.TypeExpr.Parameters 0}}{{$S := index .Field.TypeExpr.Parameters 1}}
+	{{.Name | lower}}_capr {{$G.GoImport $CapModule}}CapabilityRetriever[{{$G.GoType $C .Field.Annotations}}, {{$G.GoType $S .Field.Annotations}}],
+{{- end}}
+) {
+	{{if .IsCap}}reqs := api.Service{{else}}reqs := Make_{{.Name}}(){{end}}
+{{end}}
+
+{{define "reggetParams"}}{{- $G := .G -}}
+	{{if .IsCap}}{{$G.GoImport .Module}}AdlCapGet(mux, reqs.{{.Name | public}}, srv.{{.Name | public}}, api, capr)
+	{{- else}}{{$G.GoImport  .Module}}AdlGet(mux, reqs.{{.Name | public}}, srv.{{.Name | public}}){{end}}
+{{end}}
+
+{{define "regpostParams"}}{{- $G := .G -}}
+	{{if .IsCap}}{{$G.GoImport .Module}}AdlCapPost(mux, reqs.{{.Name | public}}, srv.{{.Name | public}}, api, capr)
+	{{- else}}{{$G.GoImport .Module}}AdlPost(mux, reqs.{{.Name | public}}, srv.{{.Name | public}}){{end}}
+{{end}}
+
+{{define "regapiParams"}}{{- $G := .G -}}
+	Register_{{.StructName | public}}(
+		mux,
+		srv.Get{{.Name | public}}(),
+	)
+{{end}}
+
+{{define "regcapapiParams"}}{{- $G := .G -}}
+	Register_{{.StructName | public}}(
+		mux,
+		srv.Get{{.Name | public}}(),
+		reqs.{{.Name | public}},
+		{{range .Kids}}{{.Name | lower}}_capr,
+	{{end}})
+{{end}}

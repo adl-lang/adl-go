@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"reflect"
 	"runtime/debug"
 	"strings"
 
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/loader"
-	"github.com/millergarym/gotmpl/text/template"
+	"github.com/adl-lang/adl-go/goadlc/internal/cli/templates"
 )
 
 type SnResolver func(sn adlast.ScopedName) (*adlast.Decl, bool)
@@ -102,28 +101,38 @@ func NewBaseGen(
 	}
 }
 
+// TemplateRenderer accumulates the body of one generated file.
 type TemplateRenderer struct {
-	Buf  bytes.Buffer
-	Tmpl *template.Template
+	Buf bytes.Buffer
 }
 
-// Render calls ExecuteTemplate to render to its buffer.
+// Render appends params, rendered by the template named after its Go type,
+// to the buffer. The "render" template does the dispatch with gotmpl's
+// tmpl_by_type, so an xxxParams value is rendered by {{define "xxxParams"}}.
 func (tr *TemplateRenderer) Render(params any) {
-	// Derive the template name from the name of the underlying type of
-	// params:
-	typeName := reflect.TypeOf(params).Name()
-	name := typeName[:len(typeName)-len("Params")]
-	err := tr.Tmpl.ExecuteTemplate(&tr.Buf, name, params)
-	if err != nil {
-		data, _ := json.Marshal(params)
-		fmt.Fprintf(os.Stderr, "error executing template -- template: %s\nerror: %v\n%s", name, err, string(data))
-		panic(err)
+	var err error
+	if err = templates.Gen.ExecuteTemplate(&tr.Buf, "render", params); err != nil {
+		renderPanic(params, err)
 	}
-	// return nil
 }
 
-func (tr *TemplateRenderer) RenderTemplate(name string, params any) error {
-	return tr.Tmpl.ExecuteTemplate(&tr.Buf, name, params)
+// RenderString renders params to a string, for callers that need a value
+// rather than an append to the file being accumulated.
+func RenderString(params any) string {
+	var (
+		buf bytes.Buffer
+		err error
+	)
+	if err = templates.Gen.ExecuteTemplate(&buf, "render", params); err != nil {
+		renderPanic(params, err)
+	}
+	return buf.String()
+}
+
+func renderPanic(params any, err error) {
+	data, _ := json.Marshal(params)
+	fmt.Fprintf(os.Stderr, "error executing template -- type: %T\nerror: %v\n%s", params, err, string(data))
+	panic(err)
 }
 
 // Bytes returns the accumulated bytes.

@@ -34,7 +34,7 @@ func (in *Generator) WriteFile(
 
 	header := &Generator{
 		BaseGen: in.BaseGen,
-		Rr:      TemplateRenderer{Tmpl: templates},
+		Rr:      TemplateRenderer{},
 	}
 	header.Rr.Render(headerParams{
 		Pkg: modCodeGenPkg,

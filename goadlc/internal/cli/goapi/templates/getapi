@@ -1,2 +1,0 @@
-{{- $G := .G -}}{{- $anns := .Annotations -}}
-	Get{{.Name | public}}() {{.StructName | public}}_Service{{if .Params}}[{{range .Params}}, {{$G.GoType . $anns}}{{end}}]{{end}}

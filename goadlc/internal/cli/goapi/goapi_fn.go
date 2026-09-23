@@ -40,7 +40,7 @@ func (in *GoApi) Run() error {
 	)
 	body := &gogen.Generator{
 		BaseGen: base,
-		Rr:      gogen.TemplateRenderer{Tmpl: templates},
+		Rr:      gogen.TemplateRenderer{},
 	}
 	apis := &apiInstance{
 		Struct:     ExpandStruct(in.Loader, st),
