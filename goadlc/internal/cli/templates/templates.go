@@ -26,6 +26,7 @@ var (
 			Funcs(template.FuncMap{
 				"public": public,
 				"lower":  strings.ToLower,
+				"panic":  func(s string) { panic(s) },
 			}).
 			ParseFS(tmplFS, "*.tmpl"))
 )

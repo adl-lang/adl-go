@@ -160,7 +160,10 @@ func (bg *goval_gen) goValue(
 				},
 				func(newtype_ adlast.NewType) string {
 					monoTe, _ := adl.SubstituteTypeBindings(tbind, newtype_.TypeExpr)
-					return fmt.Sprintf("%s(\n%s,\n)", gt, bg.goValue(decl.Annotations, monoTe, val))
+					return RenderString(ctorParams{
+						Ctor: gt.String(),
+						Args: []string{bg.goValue(decl.Annotations, monoTe, val)},
+					})
 				},
 				nil,
 			)
@@ -217,25 +220,24 @@ func (bg *Generator) goCustomType(
 	})
 }
 
+// strRep renders a TypeExpr as the Go source that reconstructs it.
 func (bg *Generator) strRep(te adlast.TypeExpr) string {
-	br := adlast.Handle_TypeRef[string](
-		te.TypeRef,
-		func(primitive string) string {
-			return fmt.Sprintf(`adlast.Make_TypeRef_primitive("%s")`, primitive)
-		},
-		func(typeParam string) string {
-			panic("typeParm not valid in mono te")
-		},
-		func(reference adlast.ScopedName) string {
-			return fmt.Sprintf(`adlast.Make_TypeRef_reference(adlast.Make_ScopedName("%s", "%s"))`, reference.ModuleName, reference.Name)
-		},
-		nil,
-	)
 	bg.Cli.GoImport("adlast", bg.ModuleName, &bg.Imports)
-	params := lo.Map[adlast.TypeExpr, string](te.Parameters, func(a adlast.TypeExpr, _ int) string {
-		return bg.strRep(a)
-	})
-	return fmt.Sprintf(`adlast.Make_TypeExpr(%s , []adlast.TypeExpr{%s})`, br, strings.Join(params, ","))
+	return RenderString(texprParams{G: bg, Te: te})
+}
+
+// texprParams renders one TypeExpr; the template recurses over Params.
+type texprParams struct {
+	G  *Generator
+	Te adlast.TypeExpr
+}
+
+func (p texprParams) Params() []texprParams {
+	out := make([]texprParams, len(p.Te.Parameters))
+	for i, te := range p.Te.Parameters {
+		out[i] = texprParams{G: p.G, Te: te}
+	}
+	return out
 }
 
 type custTypeConstructionParams struct {
@@ -270,15 +272,11 @@ func (bg *goval_gen) goStruct(
 				mn := k["moduleName"]
 				na := k["name"]
 				//TODO write custom any -> go val func
-				if v == nil {
-					annvs = append(annvs, fmt.Sprintf(`adlast.Make_ScopedName("%s", "%s"): nil`, mn, na))
-				} else {
-					annvs = append(annvs, fmt.Sprintf(`adlast.Make_ScopedName("%s", "%s"): %+#v`, mn, na, v))
-				}
+				annvs = append(annvs, RenderString(annEntryParams{ModuleName: mn, Name: na, Val: v}))
 			}
 			// sort so there is a determistic order for generated AST code
 			sort.Strings(annvs)
-			ret = append(ret, fmt.Sprintf(`customtypes.MapMap[adlast.ScopedName, any]{%s}`, strings.Join(annvs, ",")))
+			ret = append(ret, RenderString(annMapParams{Entries: annvs}))
 			return ret
 		}
 		if v, ok := mval[fld.SerializedName]; ok {
@@ -311,14 +309,10 @@ func (bg *goval_gen) goStruct(
 		}
 		return ret
 	})
-	pkg := ""
-	if gt.Pkg != "" {
-		pkg = gt.Pkg + "."
-	}
-	if len(ret) == 0 {
-		return fmt.Sprintf("%sMakeAll_%s%s()", pkg, gt.Type, gt.TypeParams.RSide())
-	}
-	return fmt.Sprintf("%sMakeAll_%s%s(\n%s,\n)", pkg, gt.Type, gt.TypeParams.RSide(), strings.Join(ret, ",\n"))
+	return RenderString(ctorParams{
+		Ctor: qualify(gt.Pkg) + "MakeAll_" + gt.Type + gt.TypeParams.RSide(),
+		Args: ret,
+	})
 }
 
 func (bg *goval_gen) goUnion(
@@ -384,24 +378,14 @@ func (bg *goval_gen) goUnion(
 	// 	}
 	// }
 
-	pkg := ""
-	if gt.Pkg != "" {
-		pkg = gt.Pkg + "."
+	ctor := ctorParams{
+		Ctor: qualify(gt.Pkg) + "Make_" + gt.Type + "_" + fld.Name + gt.TypeParams.RSide(),
 	}
-
-	isVoid := false
-	if pr, ok := fld.TypeExpr.TypeRef.Cast_primitive(); ok {
-		if pr == "Void" {
-			isVoid = true
-		}
+	// A Void branch takes no argument; every other branch takes one.
+	if pr, isPrim := fld.TypeExpr.TypeRef.Cast_primitive(); !isPrim || pr != "Void" {
+		ctor.Args = []string{bg.goValue(fld.Annotations, monoTe, v)}
 	}
-	if _, ok := fld.TypeExpr.TypeRef.Cast_reference(); ok {
-		return fmt.Sprintf("%sMake_%s_%s%s(\n%s,\n)", pkg, gt.Type, fld.Name, gt.TypeParams.RSide(), bg.goValue(fld.Annotations, monoTe, v))
-	}
-	if isVoid {
-		return fmt.Sprintf("%sMake_%s_%s%s()", pkg, gt.Type, fld.Name, gt.TypeParams.RSide())
-	}
-	return fmt.Sprintf("%sMake_%s_%s%s(\n%s,\n)", pkg, gt.Type, fld.Name, gt.TypeParams.RSide(), bg.goValue(fld.Annotations, monoTe, v))
+	return RenderString(ctor)
 
 	// ret := []string{
 	// 	fmt.Sprintf("%s%s_%s%s{\nV: %v}",
@@ -421,89 +405,144 @@ func (bg *goval_gen) goValuePrimitive(
 	primitive string,
 	val any,
 ) string {
-	// if val == nil {
-	// 	panic(fmt.Errorf("!!! primitive: %v %+#v", primitive, te))
-	// }
-	switch primitive {
-	case "TypeToken":
-		pkg, err := bg.Cli.GoImport("adlast", bg.ModuleName, &bg.Imports)
-		if err != nil {
-			panic(err)
-		}
-		// return bg.GoTexprValue(te.Parameters[0], anns)
-		gt := bg.GoType(te.Parameters[0], anns)
-		return fmt.Sprintf("%sMake_ATypeExpr[%s](%s)", pkg, gt, bg.GoTexprValue(te.Parameters[0], anns))
-	case "Int8", "Int16", "Int32", "Int64",
-		"Word8", "Word16", "Word32", "Word64",
-		"Bool", "Float", "Double":
-		return fmt.Sprintf("%v", val)
-	case "String":
-		by, _ := json.Marshal(val)
-		return string(by)
-	// case "ByteVector":
-	case "Void":
-		return "struct{}{}"
-	case "Json":
-		//TODO write custom any -> go val func
-		if val == nil {
-			return "nil"
-		}
-		return fmt.Sprintf("%+#v", val)
-	case "Vector":
-		rv := reflect.ValueOf(val)
-		vs := make([]string, rv.Len())
-		for i := 0; i < rv.Len(); i++ {
-			bg.path = append(bg.path, fmt.Sprintf("[%d]", i))
-			v := rv.Index(i)
-			vs[i] = bg.goValue(anns, te.Parameters[0], v.Interface())
-		}
-		if len(vs) == 0 {
-			return fmt.Sprintf("[]%s{}", bg.GoType(te.Parameters[0], anns))
-		}
-		vss := strings.Join(vs, ",\n")
-		return fmt.Sprintf("[]%s{\n%s,\n}", bg.GoType(te.Parameters[0], anns), vss)
-	case "StringMap":
-		m := val.(map[string]any)
-		vs := make(kvBy, 0, len(m))
-		for k, v := range m {
-			vs = append(vs, kv{k, bg.goValue(anns, te.Parameters[0], v)})
-		}
-		if len(vs) == 0 {
-			return fmt.Sprintf("map[string]%s{}", bg.GoType(te.Parameters[0], anns))
-		}
-		sort.Sort(vs)
-		return fmt.Sprintf("map[string]%s{\n%s,\n}", bg.GoType(te.Parameters[0], anns), vs)
-	case "Nullable":
-		if val == nil {
-			return "nil"
-		}
-		gl, _ := bg.Cli.GoImport("adl", bg.ModuleName, &bg.Imports)
-		return gl + "Addr(" + bg.goValue(anns, te.Parameters[0], val) + ")"
+	return RenderString(primParams{g: bg, Prim: primitive, Anns: anns, Te: te, Val: val})
+}
+
+// primParams renders a primitive value. The template picks its case by
+// primitive name, via gotmpl's dynamic template names.
+type primParams struct {
+	g    *goval_gen
+	Prim string
+	Anns adlast.Annotations
+	Te   adlast.TypeExpr
+	Val  any
+}
+
+var primTmpl = map[string]string{
+	"Int8": "prim_number", "Int16": "prim_number",
+	"Int32": "prim_number", "Int64": "prim_number",
+	"Word8": "prim_number", "Word16": "prim_number",
+	"Word32": "prim_number", "Word64": "prim_number",
+	"Bool": "prim_number", "Float": "prim_number", "Double": "prim_number",
+	// "ByteVector" is not handled.
+	"TypeToken": "prim_TypeToken",
+	"String":    "prim_String",
+	"Void":      "prim_Void",
+	"Json":      "prim_Json",
+	"Vector":    "prim_Vector",
+	"StringMap": "prim_StringMap",
+	"Nullable":  "prim_Nullable",
+}
+
+// Tmpl names the template that renders this primitive.
+func (p primParams) Tmpl() string {
+	name, ok := primTmpl[p.Prim]
+	if !ok {
+		panic("Unknown GoValuePrimitive")
 	}
-	panic("Unknown GoValuePrimitive")
+	return name
+}
+
+func (p primParams) IsNil() bool { return p.Val == nil }
+
+// JSON is the value as a JSON literal, which doubles as its Go literal.
+func (p primParams) JSON() string {
+	by, _ := json.Marshal(p.Val)
+	return string(by)
+}
+
+// GoSyntax is the value in Go-syntax representation.
+func (p primParams) GoSyntax() string { return fmt.Sprintf("%+#v", p.Val) }
+
+func (p primParams) elemTe() adlast.TypeExpr { return p.Te.Parameters[0] }
+
+// ElemGoType is the Go type of the first type parameter.
+func (p primParams) ElemGoType() goTypeExpr { return p.g.GoType(p.elemTe(), p.Anns) }
+
+// ElemValue renders the value at the element type.
+func (p primParams) ElemValue() string { return p.g.goValue(p.Anns, p.elemTe(), p.Val) }
+
+// ElemTexpr is the Go source reconstructing the element TypeExpr.
+func (p primParams) ElemTexpr() string { return p.g.GoTexprValue(p.elemTe(), p.Anns) }
+
+// Elems renders each element of a Vector.
+func (p primParams) Elems() []string {
+	rv := reflect.ValueOf(p.Val)
+	out := make([]string, rv.Len())
+	for i := range out {
+		p.g.path = append(p.g.path, fmt.Sprintf("[%d]", i))
+		out[i] = p.g.goValue(p.Anns, p.elemTe(), rv.Index(i).Interface())
+	}
+	return out
+}
+
+// Entries renders the entries of a StringMap, sorted by key so that the
+// generated code is deterministic.
+func (p primParams) Entries() kvBy {
+	m := p.Val.(map[string]any)
+	out := make(kvBy, 0, len(m))
+	for k, v := range m {
+		out = append(out, kv{k, p.g.goValue(p.Anns, p.elemTe(), v)})
+	}
+	sort.Sort(out)
+	return out
+}
+
+func (p primParams) AdlastPkg() string {
+	pkg, err := p.g.Cli.GoImport("adlast", p.g.ModuleName, &p.g.Imports)
+	if err != nil {
+		panic(err)
+	}
+	return pkg
+}
+
+func (p primParams) AdlPkg() string {
+	pkg, _ := p.g.Cli.GoImport("adl", p.g.ModuleName, &p.g.Imports)
+	return pkg
+}
+
+// ctorParams renders a call to a generated constructor: MakeAll_X for a
+// struct, Make_X_branch for a union, or a newtype conversion. No args
+// renders as "()"; otherwise each arg goes on its own line.
+type ctorParams struct {
+	Ctor string
+	Args []string
+}
+
+// annMapParams renders the annotations map of a generated AST decl.
+type annMapParams struct {
+	Entries []string
+}
+
+// annEntryParams renders one entry of that map. Entries are rendered before
+// being sorted, so that the generated AST is deterministic.
+type annEntryParams struct {
+	ModuleName any
+	Name       any
+	Val        any
+}
+
+func (p annEntryParams) IsNil() bool { return p.Val == nil }
+
+// GoSyntax is the annotation value in Go-syntax representation.
+func (p annEntryParams) GoSyntax() string { return fmt.Sprintf("%+#v", p.Val) }
+
+// qualify turns a package name into the prefix used to reference it, and is
+// empty for the package being generated.
+func qualify(pkg string) string {
+	if pkg == "" {
+		return ""
+	}
+	return pkg + "."
 }
 
 type kv struct {
-	k string
-	v string
+	K string
+	V string
 }
 
 type kvBy []kv
 
-func (kv kv) String() string {
-	return fmt.Sprintf(`"%s" : %s`, kv.k, kv.v)
-}
-func (elems kvBy) String() string {
-	var b strings.Builder
-	// b.Grow(n)
-	b.WriteString(elems[0].String())
-	for _, s := range elems[1:] {
-		b.WriteString(",\n")
-		b.WriteString(s.String())
-	}
-	return b.String()
-}
-
 func (a kvBy) Len() int           { return len(a) }
 func (a kvBy) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a kvBy) Less(i, j int) bool { return a[i].k < a[j].k }
+func (a kvBy) Less(i, j int) bool { return a[i].K < a[j].K }
