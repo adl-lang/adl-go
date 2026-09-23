@@ -19,32 +19,3 @@ import ({{range .Imports}}
 	{{if .Aliased}}{{.Name}} {{end}}"{{.Path}}"{{end}}
 )
 {{.Body}}{{end}}
-
-{{/* ---------- custom types ---------- */}}
-
-{{define "custTypeConstructionParams"}}{{- $G := .G -}}
-{{.G.GoImport "adljson"}}Unwrap(((*{{.CustomTypeHelper}})(nil)).Construct(
-		&{{.CustomType}}{{.TypeParams.RSide}}{},
-		{{.AnyValue}},
-		{{range .TypeExprStrs}}{{$G.GoImport "adl"}}CreateUncheckedJsonDecodeBinding(
-			{{.}},
-			{{$G.GoImport "adl"}}RESOLVER,
-		).Binder(),
-		{{end}}
-	)).({{.CustomType}}{{.TypeParams.RSide}}){{end}}
-
-{{/* ---------- type expressions ---------- */}}
-
-{{define "texprParams"}}adlast.Make_TypeExpr({{tmpl_by_type .Te.TypeRef.Branch "texpr" ""}} , []adlast.TypeExpr{{"{"}}{{range $i, $p := .Params}}{{if $i}},{{end}}{{template "texprParams" $p}}{{end}}{{"}"}}){{end}}
-
-{{define "texpr_TypeRef_Primitive"}}adlast.Make_TypeRef_primitive("{{.V}}"){{end}}
-
-{{define "texpr_TypeRef_Reference"}}adlast.Make_TypeRef_reference(adlast.Make_ScopedName("{{.V.ModuleName}}", "{{.V.Name}}")){{end}}
-
-{{define "texpr_TypeRef_TypeParam"}}{{panic "typeParm not valid in mono te"}}{{end}}
-
-{{/* ---------- generated-constructor calls ---------- */}}
-
-{{define "annEntryParams"}}adlast.Make_ScopedName("{{.ModuleName}}", "{{.Name}}"): {{if .IsNil}}nil{{else}}{{.GoSyntax}}{{end}}{{end}}
-
-{{define "annMapParams"}}customtypes.MapMap[adlast.ScopedName, any]{{"{"}}{{range $i, $e := .Entries}}{{if $i}},{{end}}{{$e}}{{end}}{{"}"}}{{end}}

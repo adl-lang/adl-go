@@ -5,13 +5,13 @@ import (
 	"testing"
 
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
+	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 )
 
-// The regen-and-diff check does not reach these two templates: strRep runs
-// only for decls carrying a go_custom_type annotation, and annEntryParams
-// only for a non-empty annotations list. Neither occurs in the ADL that the
-// build regenerates, so pin them here instead. The wanted strings are the
-// output of the fmt.Sprintf calls these templates replaced.
+// The regen-and-diff check does not reach two of these: strRep runs only for
+// decls carrying a go_custom_type annotation, and annEntryParams only for a
+// non-empty annotations list. Neither occurs in the ADL that the build
+// regenerates, so pin them here instead.
 
 func prim(name string) adlast.TypeExpr {
 	return adlast.Make_TypeExpr(adlast.Make_TypeRef_primitive(name), []adlast.TypeExpr{})
@@ -49,7 +49,7 @@ func TestTexprParamsTemplate(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := RenderString("texprParams", texprParams{Te: tc.te}); got != tc.want {
+			if got := (texprParams{Te: tc.te}).StringRep(); got != tc.want {
 				t.Errorf("got  %s\nwant %s", got, tc.want)
 			}
 		})
@@ -75,7 +75,7 @@ func TestAnnEntryParamsTemplate(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := RenderString("annEntryParams", tc.in); got != tc.want {
+			if got := tc.in.StringRep(); got != tc.want {
 				t.Errorf("got  %s\nwant %s", got, tc.want)
 			}
 		})
@@ -93,7 +93,7 @@ func TestAnnMapParamsTemplate(t *testing.T) {
 		{"two", []string{"a", "b"}, `customtypes.MapMap[adlast.ScopedName, any]{a,b}`},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			if got := RenderString("annMapParams", annMapParams{Entries: tc.entries}); got != tc.want {
+			if got := (annMapParams{Entries: tc.entries}).StringRep(); got != tc.want {
 				t.Errorf("got  %s\nwant %s", got, tc.want)
 			}
 		})
@@ -112,6 +112,51 @@ func TestCtorParamsTemplate(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			if got := tc.in.StringRep(); got != tc.want {
+				t.Errorf("got  %q\nwant %q", got, tc.want)
+			}
+		})
+	}
+}
+
+// stubSubTask stands in for a real generator sub-task, so that StringRep's
+// GoImport side effects have somewhere to go.
+type stubSubTask struct{}
+
+func (stubSubTask) GoImport(pkg, curr string, imports *goimports.Imports) (string, error) {
+	return pkg + ".", nil
+}
+func (stubSubTask) ReservedImports() []goimports.ImportSpec { return nil }
+func (stubSubTask) IsStdLibGen() bool                       { return false }
+func (stubSubTask) GoAdlImportPath() string                 { return "" }
+
+// The regen never reaches custTypeConstructionParams either - it runs only
+// for a decl carrying a go_custom_type annotation. These wanted strings were
+// taken from the template this method replaced, checked against it for each
+// shape below before it was deleted.
+func TestCustTypeConstructionStringRep(t *testing.T) {
+	const head = "adljson.Unwrap(((*H)(nil)).Construct(\n\t\t&pkg.T{},\n\t\tV,\n\t\t"
+	const binder1 = "adl.CreateUncheckedJsonDecodeBinding(\n\t\t\tTE1,\n\t\t\tadl.RESOLVER,\n\t\t).Binder(),\n\t\t"
+	const binder2 = "adl.CreateUncheckedJsonDecodeBinding(\n\t\t\tTE2,\n\t\t\tadl.RESOLVER,\n\t\t).Binder(),\n\t\t"
+	const tail = "\n\t)).(pkg.T)"
+
+	for _, tc := range []struct {
+		name  string
+		exprs []string
+		want  string
+	}{
+		{"no type exprs", nil, head + tail},
+		{"one type expr", []string{"TE1"}, head + binder1 + tail},
+		{"two type exprs", []string{"TE1", "TE2"}, head + binder1 + binder2 + tail},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			in := custTypeConstructionParams{
+				G:                &Generator{BaseGen: &BaseGen{Cli: stubSubTask{}}},
+				CustomTypeHelper: "H",
+				CustomType:       "pkg.T",
+				AnyValue:         "V",
+				TypeExprStrs:     tc.exprs,
+			}
+			if got := in.StringRep(); got != tc.want {
 				t.Errorf("got  %q\nwant %q", got, tc.want)
 			}
 		})

@@ -27,7 +27,6 @@ var (
 			Funcs(template.FuncMap{
 				"public": public,
 				"lower":  strings.ToLower,
-				"panic":  func(s string) { panic(s) },
 			}).
 			// SuffixLineNos("", 0, "", "").
 			ParseFS(tmplFS, "*.tmpl"))

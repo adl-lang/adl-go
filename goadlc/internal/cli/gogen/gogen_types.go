@@ -1,7 +1,6 @@
 package gogen
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/loader"
-	"github.com/adl-lang/adl-go/goadlc/internal/cli/templates"
 )
 
 type SnResolver func(sn adlast.ScopedName) (*adlast.Decl, bool)
@@ -68,6 +66,19 @@ func (in *Generator) GoImport(s string) (string, error) {
 	return in.Cli.GoImport(s, in.ModuleName, &in.Imports)
 }
 
+// mustImport is GoImport for callers that treat an unknown package as a bug,
+// matching what a template does when it calls .GoImport.
+func (in *Generator) mustImport(pkg string) string {
+	var (
+		qualifier string
+		err       error
+	)
+	if qualifier, err = in.GoImport(pkg); err != nil {
+		panic(err)
+	}
+	return qualifier
+}
+
 func (in *Generator) ToTitle(s string) string {
 	return strings.ToTitle(s)
 }
@@ -98,20 +109,6 @@ func NewBaseGen(
 		ModuleName: moduleName,
 		Imports:    imports,
 	}
-}
-
-// RenderString renders params with the named template, for callers that
-// need a value rather than a piece of the file being written. Whole files go
-// through WriteFile and the "file" template instead.
-func RenderString(tmpl string, params any) string {
-	var (
-		buf bytes.Buffer
-		err error
-	)
-	if err = templates.Gen.ExecuteTemplate(&buf, tmpl, params); err != nil {
-		renderPanic(params, err)
-	}
-	return buf.String()
 }
 
 func renderPanic(params any, err error) {
