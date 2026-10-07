@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+tasks:
+
+  gen:
+    cmds:
+      - go run ../goadlc/main.go -cfg ./cfgs/visitor.cfg.json
+
+  test:
+    cmds:
+      - go test ./...

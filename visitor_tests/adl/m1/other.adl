@@ -1,0 +1,9 @@
+// M1 cross-module input: m1.shapes.Shape has a field of type Tag, so a
+// walk over a Shape must descend into this module's generated Accept.
+module m1.other {
+
+struct Tag {
+    String label;
+};
+
+};

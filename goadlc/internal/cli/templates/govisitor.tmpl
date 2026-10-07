@@ -1,0 +1,170 @@
+{{/*
+goadlc govisitor: Visitor interfaces and Accept methods for an ADL module's
+decls, written beside the gotypes file in the same package.
+
+One define per xxxParams type; the DefaultAccept of a decl is chosen by
+tmpl_by_type on its DeclType branch, and the body of an Accept<Field> or of
+a union branch case by tmpl_by_type on its visitNode. $D (the decl) and $G
+(its generator) are ambient in everything a decl renders. Dispatch is never through a
+variable-named {{template $n}}: under dynamic scoping gotmpl resolves that
+name to the outermost $n, which breaks recursion.
+*/}}
+
+{{/* ---------- file body ---------- */}}
+
+{{define "govisitor_body"}}{{range .Decls}}{{template "visitorDeclParams" .}}{{end}}{{end}}
+
+{{/* ---------- one decl ---------- */}}
+
+{{define "visitorDeclParams"}}{{$D := .}}{{$G := .G}}
+{{template "visitor_interfaces" .}}
+{{template "visitor_accept" .}}
+{{tmpl_by_type .Decl.Type_.Branch.V "default_accept_" ""}}
+{{- end}}
+
+{{define "visitor_interfaces"}}
+type Visitor_{{.Name}}{{.IfaceTP}} interface {
+	Visit{{.Name}}(node *{{.NodeType}})
+}
+type VisitorE_{{.Name}}{{.IfaceTP}} interface {
+	Visit{{.Name}}(node *{{.NodeType}}) error
+}
+type VisitorP_{{.Name}}{{.IfaceTP}} interface {
+	Visit{{.Name}}(node *{{.NodeType}}, payload {{.P}})
+}
+type VisitorPE_{{.Name}}{{.IfaceTP}} interface {
+	Visit{{.Name}}(node *{{.NodeType}}, payload {{.P}}) error
+}
+type VisitorR_{{.Name}}{{.IfaceTP}} interface {
+	Visit{{.Name}}(node *{{.NodeType}}) (result {{.R}})
+}
+type VisitorRE_{{.Name}}{{.IfaceTP}} interface {
+	Visit{{.Name}}(node *{{.NodeType}}) (result {{.R}}, err error)
+}
+type VisitorPR_{{.Name}}{{.IfaceTP}} interface {
+	Visit{{.Name}}(node *{{.NodeType}}, payload {{.P}}) (result {{.R}})
+}
+type VisitorPRE_{{.Name}}{{.IfaceTP}} interface {
+	Visit{{.Name}}(node *{{.NodeType}}, payload {{.P}}) (result {{.R}}, err error)
+}
+{{end}}
+
+{{define "visitor_accept"}}
+func (node *{{.NodeType}}) Accept{{.MethodTP}}(visitor any, payload {{.P}}) (result {{.R}}, err error) {
+	if v, ok := visitor.(Visitor_{{.Name}}{{.IfaceTA}}); ok {
+		v.Visit{{.Name}}(node)
+		return
+	}
+	if v, ok := visitor.(VisitorE_{{.Name}}{{.IfaceTA}}); ok {
+		err = v.Visit{{.Name}}(node)
+		return
+	}
+	if v, ok := visitor.(VisitorP_{{.Name}}{{.IfaceTA}}); ok {
+		v.Visit{{.Name}}(node, payload)
+		return
+	}
+	if v, ok := visitor.(VisitorPE_{{.Name}}{{.IfaceTA}}); ok {
+		err = v.Visit{{.Name}}(node, payload)
+		return
+	}
+	if v, ok := visitor.(VisitorR_{{.Name}}{{.IfaceTA}}); ok {
+		result = v.Visit{{.Name}}(node)
+		return
+	}
+	if v, ok := visitor.(VisitorRE_{{.Name}}{{.IfaceTA}}); ok {
+		result, err = v.Visit{{.Name}}(node)
+		return
+	}
+	if v, ok := visitor.(VisitorPR_{{.Name}}{{.IfaceTA}}); ok {
+		result = v.Visit{{.Name}}(node, payload)
+		return
+	}
+	if v, ok := visitor.(VisitorPRE_{{.Name}}{{.IfaceTA}}); ok {
+		result, err = v.Visit{{.Name}}(node, payload)
+		return
+	}
+{{if not .SkipTypeCheckMethod}}	{{.G.GoImport "visit"}}TypeCheckMethod{{.MethodTA}}(visitor, "{{.Name}}", node)
+{{end}}	return node.DefaultAccept{{.MethodTA}}(visitor, payload)
+}
+{{end}}
+
+{{/* ---------- DefaultAccept, by decl kind ---------- */}}
+
+{{/*
+A struct's DefaultAccept calls the helper of each descended field in
+declaration order and stops at the first error; leaf fields keep their
+helper but are not called, so the result is the last descended field's.
+*/}}
+
+{{define "default_accept_Struct"}}
+func (node *{{$D.NodeType}}) DefaultAccept{{$D.MethodTP}}(visitor any, payload {{$D.P}}) (result {{$D.R}}, err error) {
+{{range $D.Fields}}{{if .Descended}}	if result, err = node.Accept{{.Name}}{{$D.MethodTA}}(visitor, payload); err != nil {
+		return
+	}
+{{end}}{{end}}	return
+}
+{{range $D.Fields}}{{template "acceptFieldParams" .}}{{end}}
+{{- end}}
+
+{{/*
+A union's DefaultAccept switches on the branch struct and visits the branch
+value b.V as a struct field would be: a direct Accept is returned, a
+container is walked then returned, a leaf is a comment. The binding is
+dropped when no branch is descended, since Go rejects an unused one.
+*/}}
+
+{{define "default_accept_Union"}}
+func (node *{{$D.NodeType}}) DefaultAccept{{$D.MethodTP}}(visitor any, payload {{$D.P}}) (result {{$D.R}}, err error) {
+	switch {{if $D.BranchBound}}b := {{end}}node.Branch.(type) {
+{{range $D.Branches}}	case {{.TypeName}}:
+{{with .Direct}}		return {{.Expr}}.Accept{{$D.MethodTA}}(visitor, payload)
+{{else}}{{tmpl_by_type .Visit "" ""}}		return
+{{end}}{{end}}	}
+	panic("unhandled branch in : {{$D.Name}}")
+}
+{{end}}
+
+{{/*
+A newtype's DefaultAccept visits the underlying value, *node, as a struct
+field would be: a newtype over a generated decl is converted and its
+Accept returned, a container is walked then returned, a leaf is a comment.
+*/}}
+
+{{define "default_accept_NewType"}}
+func (node *{{$D.NodeType}}) DefaultAccept{{$D.MethodTP}}(visitor any, payload {{$D.P}}) (result {{$D.R}}, err error) {
+{{with $D.UnderlyingDirect}}	return {{.Expr}}.Accept{{$D.MethodTA}}(visitor, payload)
+{{else}}{{tmpl_by_type $D.Underlying "" ""}}	return
+{{end}}}
+{{end}}
+
+{{/* ---------- Accept<Field> ---------- */}}
+
+{{define "acceptFieldParams"}}
+func (node *{{$D.NodeType}}) Accept{{.Name}}{{$D.MethodTP}}(visitor any, payload {{$D.P}}) (result {{$D.R}}, err error) {
+{{with .Direct}}	return {{.Expr}}.Accept{{$D.MethodTA}}(visitor, payload)
+{{else}}{{tmpl_by_type .Visit "" ""}}	return
+{{end}}}
+{{end}}
+
+{{/* ---------- <visit expr as T>, one define per visitNode type ---------- */}}
+
+{{define "leafVisit"}}	// leaf: {{.Type}}
+{{end}}
+
+{{define "acceptVisit"}}	if result, err = {{.Expr}}.Accept{{$D.MethodTA}}(visitor, payload); err != nil {
+		return
+	}
+{{end}}
+
+{{define "vectorVisit"}}	for {{.Index}} := range {{.Expr}} {
+{{tmpl_by_type .Elem "" ""}}	}
+{{end}}
+
+{{define "nullableVisit"}}	if {{.Expr}} != nil {
+{{tmpl_by_type .Elem "" ""}}	}
+{{end}}
+
+{{define "stringmapVisit"}}	for _, {{.Key}} := range {{$G.GoImport "slices"}}Sorted({{$G.GoImport "maps"}}Keys({{.Expr}})) {
+		{{.Val}} := {{.Indexed .Key}}
+{{tmpl_by_type .Elem "" ""}}	}
+{{end}}

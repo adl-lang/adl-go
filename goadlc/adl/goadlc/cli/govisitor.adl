@@ -1,0 +1,27 @@
+module cli.govisitor {
+
+import cli.root.Root;
+import cli.loader.LoadResult;
+import cli.gomod.GoModResult;
+
+struct GoVisitor {
+    @SerializedName "-"
+    Nullable<Root> root = null;
+    @SerializedName "-"
+    Nullable<LoadResult> loader = null;
+    @SerializedName "-"
+    Nullable<GoModResult> goMod = null;
+    /// Don't run 'go fmt' on the generated files
+    Bool NoGoFmt = false;
+    /// The path to the Go ADL runtime import; the visitor runtime is <GoAdlPath>/visit
+    String GoAdlPath = "github.com/adl-lang/adl-go/adl";
+    /// ADL modules to generate visitors for. Empty means every loaded module
+    /// (bundle modules such as sys.* are never generated)
+    Vector<String> Modules = [];
+    /// Omit the visit.TypeCheckMethod call from each Accept
+    Bool SkipTypeCheckMethod = false;
+    /// output dir; must be the same as GoTypes.Outputdir
+    String Outputdir;
+};
+
+};

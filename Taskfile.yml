@@ -16,6 +16,10 @@ includes:
     taskfile: ./tests/Taskfile.local.yml
     dir: ./tests
 
+  visitor_tests:
+    taskfile: ./visitor_tests/Taskfile.local.yml
+    dir: ./visitor_tests
+
 tasks:
 
   gen:
@@ -26,8 +30,10 @@ tasks:
       - task goadlc:gen_stdlib
       - task tests:gen_exer
       - task tests:gen_api
+      - task visitor_tests:gen
 
   test:
     cmds:
       - task tests:test
       - task goadlc:test
+      - task visitor_tests:test

@@ -1,0 +1,60 @@
+// M2 input: sheafdb/samples/goohm/tree.adl with the module renamed. Every
+// decl is kept as is. The unions Node, SeqSpec, Path and Part exercise
+// section 4.4 of plan4.md: struct branches, a union branch (Node.ref ->
+// Ref.path -> Path), a bundle-generic leaf branch (SeqSpec.nums) and a
+// primitive leaf branch (Part.index).
+module m2.tree {
+
+struct Axis {
+    Vector<Node> nodes;
+};
+
+union Node {
+    Atom atom;
+    Ref ref;
+    Seq seq;
+    Hierachy hierachy;
+};
+
+struct Atom {
+    String name;
+    Bool quoted;
+};
+
+struct Ref {
+    Path path;
+};
+
+struct Seq {
+    SeqSpec start;
+};
+
+struct Hierachy  {
+    Atom node;
+    Vector<Node> kids;
+};
+
+union SeqSpec  {
+    sys.types.Pair<Int64, Int64> nums;
+};
+
+union Path {
+    CanonicalPath canonical;
+    ShortPath short;
+};
+
+struct CanonicalPath {
+    Vector<Part> parts;
+};
+
+struct ShortPath {
+    Atom anchor;
+    Vector<Part> parts;
+};
+
+union Part {
+    Atom atom;
+    Word64 index;
+};
+
+};

@@ -1,0 +1,68 @@
+// M1 inputs: non-generic structs with every field shape section 4.3 of
+// plan4.md distinguishes. Nothing here needs M3 (generics / newtypes):
+// Pair is a bundle generic and so a leaf. Colour is a union: a leaf in
+// M1, descended from M2 on (m1_test.go TestUnionFieldDescended).
+module m1.shapes {
+
+import m1.other.Tag;
+import sys.types.Pair;
+
+/// Primitive fields only: every Accept<Field> is a leaf, DefaultAccept
+/// just returns.
+struct Point {
+    Int32 x;
+    Int32 y;
+};
+
+/// Nested structs; the "last field's result" rule makes DefaultAccept
+/// return b's result.
+struct Segment {
+    Point a;
+    Point b;
+};
+
+/// A descended field followed by a leaf: DefaultAccept skips the leaf and
+/// returns at's result.
+struct Labelled {
+    Point at;
+    String text;
+};
+
+/// No fields: DefaultAccept just returns.
+struct Empty {
+};
+
+/// A union: a leaf in M1 (no Accept is generated for it), descended from
+/// M2 on. Its own branches are all leaves.
+union Colour {
+    Void red;
+    Void green;
+    String custom;
+};
+
+/// A type alias to a struct: expanded wherever it appears, so a field of
+/// type Origin is descended exactly as a Point field is.
+type Origin = Point;
+
+struct Shape {
+    String name;
+    Origin origin;
+    Vector<Point> outline;
+    Nullable<Point> pivot;
+    StringMap<Point> named;
+    Vector<Nullable<Point>> sparse;
+    Vector<Vector<Point>> rings;
+    Pair<Int64,Int64> extent;
+    Colour colour;
+    Vector<String> labels;
+    Empty empty;
+    Tag tag;
+};
+
+struct Scene {
+    Vector<Shape> shapes;
+    Nullable<Shape> focus;
+    Segment diagonal;
+};
+
+};

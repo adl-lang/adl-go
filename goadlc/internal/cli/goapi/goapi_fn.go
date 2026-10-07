@@ -5,12 +5,10 @@ import (
 	fp "path/filepath"
 	"strings"
 
-	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/customtypes"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gogen"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
-	"github.com/adl-lang/adl-go/goadlc/internal/cli/loader"
 	"github.com/samber/lo"
 )
 
@@ -40,7 +38,7 @@ func (in *GoApi) Run() error {
 	)
 	body := &gogen.Generator{BaseGen: base}
 	apis := &apiInstance{
-		Struct:     ExpandStruct(in.Loader, st),
+		Struct:     gogen.ExpandStruct(in.Loader, st),
 		ScopedName: in.ApiStruct,
 		Field:      nil,
 	}
@@ -110,7 +108,7 @@ func (in *GoApi) dfs(root *apiInstance, apiSt *apiInstance, visited map[string]b
 					return fmt.Errorf("unexpected - cap api is not a struct. Ref : %v", apiRef)
 				}
 				inst0 := &apiInstance{
-					Struct:     ExpandStruct(in.Loader, capSt),
+					Struct:     gogen.ExpandStruct(in.Loader, capSt),
 					ScopedName: apiRef,
 					Field:      &fi,
 				}
@@ -133,7 +131,7 @@ func (in *GoApi) dfs(root *apiInstance, apiSt *apiInstance, visited map[string]b
 					return fmt.Errorf("unexpected - api is not a struct. Ref : %v", ref)
 				}
 				inst0 := &apiInstance{
-					Struct:     ExpandStruct(in.Loader, struct_),
+					Struct:     gogen.ExpandStruct(in.Loader, struct_),
 					ScopedName: ref,
 					Field:      nil,
 				}
@@ -365,31 +363,4 @@ func (in *GoApi) GoImport(pkg string, currModuleName string, imports *goimports.
 		imports.AddPath(spec.Path)
 		return spec.Name + ".", nil
 	}
-}
-
-func ExpandStruct(lr *loader.LoadResult, st adlast.Struct) adlast.Struct {
-	return adlast.Make_Struct(
-		st.TypeParams,
-		lo.Map[adlast.Field](st.Fields, func(f adlast.Field, _ int) adlast.Field {
-			te := ExpandTypeAliases(lr, f.TypeExpr)
-			return adlast.MakeAll_Field(
-				f.Name, f.SerializedName, te, f.Default, f.Annotations,
-			)
-		}),
-	)
-}
-
-func ExpandTypeAliases(lr *loader.LoadResult, te adlast.TypeExpr) adlast.TypeExpr {
-	if ref, ok := te.TypeRef.Cast_reference(); ok {
-		if decl, ex := lr.Resolver(ref); !ex {
-			panic(fmt.Errorf("can't resolve type alias, %v ", ref))
-		} else {
-			if ta, ok1 := decl.Type_.Cast_type_(); ok1 {
-				binding := adl.CreateDecBoundTypeParams(ta.TypeParams, ta.TypeExpr.Parameters)
-				mono, _ := adl.SubstituteTypeBindings(binding, ta.TypeExpr)
-				return ExpandTypeAliases(lr, mono)
-			}
-		}
-	}
-	return te
 }
