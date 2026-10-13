@@ -15,20 +15,8 @@ import (
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
 	"github.com/adl-lang/adl-go/adl/sys/types"
 
-	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
-
 	"github.com/samber/lo"
 )
-
-func (*Generator) JsonEncode(val any) string {
-	var buf bytes.Buffer
-	enc := json.NewEncoder(&buf)
-	err := enc.Encode(val)
-	if err != nil {
-		panic(err)
-	}
-	return string(bytes.Trim(buf.Bytes(), "\n"))
-}
 
 func (bg *Generator) GoDeclValue(val adlast.Decl) string {
 	defer func() {
@@ -160,7 +148,10 @@ func (bg *goval_gen) goValue(
 				},
 				func(newtype_ adlast.NewType) string {
 					monoTe, _ := adl.SubstituteTypeBindings(tbind, newtype_.TypeExpr)
-					return fmt.Sprintf("%s(\n%s,\n)", gt, bg.goValue(decl.Annotations, monoTe, val))
+					return ctorParams{
+						Ctor: gt.String(),
+						Args: []string{bg.goValue(decl.Annotations, monoTe, val)},
+					}.StringRep()
 				},
 				nil,
 			)
@@ -175,57 +166,41 @@ func (bg *Generator) goCustomType(
 	gt goTypeExpr,
 	val any,
 ) string {
-	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
-	gct, err := adl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
-	if err != nil {
-		panic(err)
-	}
-	{
-		pkg := gct.Gotype.Import_path[strings.LastIndex(gct.Gotype.Import_path, "/")+1:]
-		spec := goimports.ImportSpec{
-			Path:    gct.Gotype.Import_path,
-			Name:    gct.Gotype.Pkg,
-			Aliased: gct.Gotype.Pkg != pkg,
-		}
-		bg.Imports.AddSpec(spec)
-	}
-
-	gen := &Generator{
-		BaseGen: bg.BaseGen,
-		Rr:      TemplateRenderer{Tmpl: templates},
-	}
+	gct := GoCustomTypeAnn(decl.Annotations)
+	bg.Imports.AddSpec(GoCustomTypeSpec(gct))
 
 	typeExprStrs := lo.Map[adlast.TypeExpr, string](monoTe.Parameters, func(a adlast.TypeExpr, _ int) string {
 		return bg.strRep(a)
 	})
 
-	helperName := gct.Helpers.Name
-	if gct.Helpers.Ref != nil {
-		helperName = gct.Helpers.Ref.Pkg + "." + gct.Helpers.Name
-		pkg := gct.Helpers.Ref.Import_path[strings.LastIndex(gct.Helpers.Ref.Import_path, "/")+1:]
-		spec := goimports.ImportSpec{
-			Path:    gct.Helpers.Ref.Import_path,
-			Name:    gct.Helpers.Ref.Pkg,
-			Aliased: gct.Helpers.Ref.Pkg != pkg,
-		}
-		bg.Imports.AddSpec(spec)
-	}
-	gen.Rr.Render(custTypeConstructionParams{
-		G:                gen,
+	return custTypeConstructionParams{
+		G:                bg,
 		Name:             decl.Name,
 		ModuleName:       bg.ModuleName,
 		TypeParams:       gt.TypeParams,
 		AnyValue:         fmt.Sprintf("%+#v", val),
 		CustomType:       gct.Gotype.Pkg + "." + gct.Gotype.Name,
-		CustomTypeHelper: helperName,
+		CustomTypeHelper: bg.HelperName(gct),
 		TypeExprStrs:     typeExprStrs,
-	})
-	return gen.Rr.Buf.String()
+	}.StringRep()
 }
 
+// strRep renders a TypeExpr as the Go source that reconstructs it.
 func (bg *Generator) strRep(te adlast.TypeExpr) string {
-	br := adlast.Handle_TypeRef[string](
-		te.TypeRef,
+	bg.Cli.GoImport("adlast", bg.ModuleName, &bg.Imports)
+	return texprParams{G: bg, Te: te}.StringRep()
+}
+
+// texprParams renders one TypeExpr as the Go source that reconstructs it,
+// recursing over the expression's own parameters.
+type texprParams struct {
+	G  *Generator
+	Te adlast.TypeExpr
+}
+
+func (p texprParams) StringRep() string {
+	ref := adlast.Handle_TypeRef[string](
+		p.Te.TypeRef,
 		func(primitive string) string {
 			return fmt.Sprintf(`adlast.Make_TypeRef_primitive("%s")`, primitive)
 		},
@@ -233,15 +208,17 @@ func (bg *Generator) strRep(te adlast.TypeExpr) string {
 			panic("typeParm not valid in mono te")
 		},
 		func(reference adlast.ScopedName) string {
-			return fmt.Sprintf(`adlast.Make_TypeRef_reference(adlast.Make_ScopedName("%s", "%s"))`, reference.ModuleName, reference.Name)
+			return fmt.Sprintf(`adlast.Make_TypeRef_reference(adlast.Make_ScopedName("%s", "%s"))`,
+				reference.ModuleName, reference.Name)
 		},
 		nil,
 	)
-	bg.Cli.GoImport("adlast", bg.ModuleName, &bg.Imports)
-	params := lo.Map[adlast.TypeExpr, string](te.Parameters, func(a adlast.TypeExpr, _ int) string {
-		return bg.strRep(a)
-	})
-	return fmt.Sprintf(`adlast.Make_TypeExpr(%s , []adlast.TypeExpr{%s})`, br, strings.Join(params, ","))
+	params := make([]string, len(p.Te.Parameters))
+	for i, te := range p.Te.Parameters {
+		params[i] = texprParams{G: p.G, Te: te}.StringRep()
+	}
+	return fmt.Sprintf(`adlast.Make_TypeExpr(%s , []adlast.TypeExpr{%s})`,
+		ref, strings.Join(params, ","))
 }
 
 type custTypeConstructionParams struct {
@@ -253,6 +230,22 @@ type custTypeConstructionParams struct {
 	CustomType       string
 	CustomTypeHelper string
 	TypeExprStrs     []string
+}
+
+func (p custTypeConstructionParams) StringRep() string {
+	// GoImport is what marks the package used, so it has to be called even
+	// where the qualifier it returns is spliced in below.
+	adljson := p.G.mustImport("adljson")
+	binders := &strings.Builder{}
+	for _, texpr := range p.TypeExprStrs {
+		adlPkg := p.G.mustImport("adl")
+		fmt.Fprintf(binders, "%sCreateUncheckedJsonDecodeBinding(\n\t\t\t%s,\n\t\t\t%sRESOLVER,\n\t\t).Binder(),\n\t\t",
+			adlPkg, texpr, adlPkg)
+	}
+	rside := p.TypeParams.RSide()
+	return fmt.Sprintf("%sUnwrap(((*%s)(nil)).Construct(\n\t\t&%s%s{},\n\t\t%s,\n\t\t%s\n\t)).(%s%s)",
+		adljson, p.CustomTypeHelper, p.CustomType, rside, p.AnyValue,
+		binders.String(), p.CustomType, rside)
 }
 
 func (bg *goval_gen) goStruct(
@@ -276,15 +269,11 @@ func (bg *goval_gen) goStruct(
 				mn := k["moduleName"]
 				na := k["name"]
 				//TODO write custom any -> go val func
-				if v == nil {
-					annvs = append(annvs, fmt.Sprintf(`adlast.Make_ScopedName("%s", "%s"): nil`, mn, na))
-				} else {
-					annvs = append(annvs, fmt.Sprintf(`adlast.Make_ScopedName("%s", "%s"): %+#v`, mn, na, v))
-				}
+				annvs = append(annvs, annEntryParams{ModuleName: mn, Name: na, Val: v}.StringRep())
 			}
 			// sort so there is a determistic order for generated AST code
 			sort.Strings(annvs)
-			ret = append(ret, fmt.Sprintf(`customtypes.MapMap[adlast.ScopedName, any]{%s}`, strings.Join(annvs, ",")))
+			ret = append(ret, annMapParams{Entries: annvs}.StringRep())
 			return ret
 		}
 		if v, ok := mval[fld.SerializedName]; ok {
@@ -317,14 +306,10 @@ func (bg *goval_gen) goStruct(
 		}
 		return ret
 	})
-	pkg := ""
-	if gt.Pkg != "" {
-		pkg = gt.Pkg + "."
-	}
-	if len(ret) == 0 {
-		return fmt.Sprintf("%sMakeAll_%s%s()", pkg, gt.Type, gt.TypeParams.RSide())
-	}
-	return fmt.Sprintf("%sMakeAll_%s%s(\n%s,\n)", pkg, gt.Type, gt.TypeParams.RSide(), strings.Join(ret, ",\n"))
+	return ctorParams{
+		Ctor: qualify(gt.Pkg) + "MakeAll_" + gt.Type + gt.TypeParams.RSide(),
+		Args: ret,
+	}.StringRep()
 }
 
 func (bg *goval_gen) goUnion(
@@ -390,24 +375,14 @@ func (bg *goval_gen) goUnion(
 	// 	}
 	// }
 
-	pkg := ""
-	if gt.Pkg != "" {
-		pkg = gt.Pkg + "."
+	ctor := ctorParams{
+		Ctor: qualify(gt.Pkg) + "Make_" + gt.Type + "_" + fld.Name + gt.TypeParams.RSide(),
 	}
-
-	isVoid := false
-	if pr, ok := fld.TypeExpr.TypeRef.Cast_primitive(); ok {
-		if pr == "Void" {
-			isVoid = true
-		}
+	// A Void branch takes no argument; every other branch takes one.
+	if pr, isPrim := fld.TypeExpr.TypeRef.Cast_primitive(); !isPrim || pr != "Void" {
+		ctor.Args = []string{bg.goValue(fld.Annotations, monoTe, v)}
 	}
-	if _, ok := fld.TypeExpr.TypeRef.Cast_reference(); ok {
-		return fmt.Sprintf("%sMake_%s_%s%s(\n%s,\n)", pkg, gt.Type, fld.Name, gt.TypeParams.RSide(), bg.goValue(fld.Annotations, monoTe, v))
-	}
-	if isVoid {
-		return fmt.Sprintf("%sMake_%s_%s%s()", pkg, gt.Type, fld.Name, gt.TypeParams.RSide())
-	}
-	return fmt.Sprintf("%sMake_%s_%s%s(\n%s,\n)", pkg, gt.Type, fld.Name, gt.TypeParams.RSide(), bg.goValue(fld.Annotations, monoTe, v))
+	return ctor.StringRep()
 
 	// ret := []string{
 	// 	fmt.Sprintf("%s%s_%s%s{\nV: %v}",
@@ -419,6 +394,64 @@ func (bg *goval_gen) goUnion(
 	// 	),
 	// }
 	// return fmt.Sprintf("%s{\nBranch: %s,\n}", gt.String(), strings.Join(ret, ",\n"))
+}
+
+// ctorParams renders a call to a generated constructor: MakeAll_X for a
+// struct, Make_X_branch for a union, or a newtype conversion. No args
+// renders as "()"; otherwise each arg goes on its own line.
+type ctorParams struct {
+	Ctor string
+	Args []string
+}
+
+func (p ctorParams) StringRep() string {
+	sb := &strings.Builder{}
+	sb.WriteString(p.Ctor)
+	sb.WriteString("(")
+	for i, a := range p.Args {
+		if i == 0 {
+			sb.WriteString("\n")
+		}
+		sb.WriteString(a)
+		sb.WriteString(",")
+		sb.WriteString("\n")
+	}
+	sb.WriteString(")")
+	return sb.String()
+}
+
+// annMapParams renders the annotations map of a generated AST decl.
+type annMapParams struct {
+	Entries []string
+}
+
+func (p annMapParams) StringRep() string {
+	return fmt.Sprintf(`customtypes.MapMap[adlast.ScopedName, any]{%s}`,
+		strings.Join(p.Entries, ","))
+}
+
+// annEntryParams renders one entry of that map. Entries are rendered before
+// being sorted, so that the generated AST is deterministic.
+type annEntryParams struct {
+	ModuleName any
+	Name       any
+	Val        any
+}
+
+func (p annEntryParams) StringRep() string {
+	if p.Val == nil {
+		return fmt.Sprintf(`adlast.Make_ScopedName("%s", "%s"): nil`, p.ModuleName, p.Name)
+	}
+	return fmt.Sprintf(`adlast.Make_ScopedName("%s", "%s"): %+#v`, p.ModuleName, p.Name, p.Val)
+}
+
+// qualify turns a package name into the prefix used to reference it, and is
+// empty for the package being generated.
+func qualify(pkg string) string {
+	if pkg == "" {
+		return ""
+	}
+	return pkg + "."
 }
 
 func (bg *goval_gen) goValuePrimitive(

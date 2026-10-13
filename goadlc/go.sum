@@ -2,6 +2,8 @@ github.com/adl-lang/adl-go/adl v1.0.0 h1:y2zb8TYkUZJ5ShixWsJmNSIVMuhGH2Oz69+5lja
 github.com/adl-lang/adl-go/adl v1.0.0/go.mod h1:BW/pu1we1Ki4MfgFaerlrUpALr/JEn8mHKRUW166aKg=
 github.com/mattn/go-zglob v0.0.8 h1:g/5T0tizbs+419GtiXvMDkOg+RIBu1qi+B2teiHsnNE=
 github.com/mattn/go-zglob v0.0.8/go.mod h1:MxxjyoXXnMxfIpxTK2GAkw1w8glPsQILx3N5wrKakiY=
+github.com/millergarym/gotmpl v1.2.0 h1:Bw9eun9yuj/a9jSUfdEXyY0CISoc5aCdIJHicI4v8eI=
+github.com/millergarym/gotmpl v1.2.0/go.mod h1:GmWOrGM7fip3jMEBxI9hlFSEgcMBF1WTxROnYQD0Tcc=
 github.com/samber/lo v1.53.0 h1:t975lj2py4kJPQ6haz1QMgtId2gtmfktACxIXArw3HM=
 github.com/samber/lo v1.53.0/go.mod h1:4+MXEGsJzbKGaUEQFKBq2xtfuznW9oz/WrgyzMzRoM0=
 golang.org/x/mod v0.41.0 h1:qJmnOUb4YB+FsEuM3HcWucdZASCPGhsX6uljO6pog0c=

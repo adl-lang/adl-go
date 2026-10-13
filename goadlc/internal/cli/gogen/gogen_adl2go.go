@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
-	"strings"
 
 	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
-	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 	"github.com/samber/lo"
 )
 
@@ -152,18 +150,8 @@ func (in *BaseGen) gotype_ref_customtype(
 	unionTypeParams *TypeParam,
 	anns adlast.Annotations,
 ) goTypeExpr {
-	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
-	gct, err := adl.GetAnnotation(decl.Annotations, GoCustomTypeSN, jb)
-	if err != nil {
-		panic(fmt.Errorf("error getting go_custom_type annotation for %v. err : %w", decl.Name, err))
-	}
-	pkg := gct.Gotype.Import_path[strings.LastIndex(gct.Gotype.Import_path, "/")+1:]
-	spec := goimports.ImportSpec{
-		Path:    gct.Gotype.Import_path,
-		Name:    gct.Gotype.Pkg,
-		Aliased: gct.Gotype.Pkg != pkg,
-	}
-	in.Imports.AddSpec(spec)
+	gct := GoCustomTypeAnn(decl.Annotations)
+	in.Imports.AddSpec(GoCustomTypeSpec(gct))
 	got := goTypeExpr{
 		Pkg:  gct.Gotype.Pkg,
 		Type: gct.Gotype.Name,

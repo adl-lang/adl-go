@@ -16,8 +16,24 @@ includes:
     taskfile: ./tests/Taskfile.local.yml
     dir: ./tests
 
+  visitor_tests:
+    taskfile: ./visitor_tests/Taskfile.local.yml
+    dir: ./visitor_tests
+
 tasks:
 
-  hw:
+  gen:
     cmds:
-      - echo "hw"
+      - task gen_prim_texpr:gen_texpr
+      - task goadlc:gen_adlast
+      - task goadlc:gen_goadlc
+      - task goadlc:gen_stdlib
+      - task tests:gen_exer
+      - task tests:gen_api
+      - task visitor_tests:gen
+
+  test:
+    cmds:
+      - task tests:test
+      - task goadlc:test
+      - task visitor_tests:test

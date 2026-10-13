@@ -1,0 +1,22 @@
+// M2 input: the union branch shapes tree.adl does not have. Every branch
+// of Thing refers to m2.tree.Atom across modules; the Void and String
+// branches are leaves. Holder has the Vector<Union> and Nullable<Union>
+// struct fields that M1 treated as leaves and M2 descends.
+module m2.extra {
+
+import m2.tree.Atom;
+
+union Thing {
+    Void nothing;
+    Vector<Atom> atoms;
+    Nullable<Atom> maybe;
+    StringMap<Atom> named;
+    String text;
+};
+
+struct Holder {
+    Vector<Thing> things;
+    Nullable<Thing> focus;
+};
+
+};

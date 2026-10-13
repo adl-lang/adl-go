@@ -1,0 +1,33 @@
+// M3 input: generic structs and unions (plan4.md section 4.6). Every decl
+// here has type params, so M1/M2 treated them as leaves; M3 generates
+// them with the decl's own params prepended to the visitor interfaces'.
+// A field whose type is (or contains only) a type parameter is a leaf,
+// however the decl is instantiated: Box<Atom>.item is never descended.
+module m3.gen {
+
+import m2.tree.Atom;
+
+/// item and items are leaves (T and Vector<T>); tag is descended.
+struct Box<T> {
+    T item;
+    Vector<T> items;
+    Atom tag;
+};
+
+/// some is a leaf (T), none is a leaf (Void), xs is descended.
+union Opt<T> {
+    T some;
+    Void none;
+    Vector<Atom> xs;
+};
+
+/// Type params that clash with the payload/result params: the generated
+/// interfaces are Visitor_Weird[P, R, P2, R2 any] and the methods take
+/// [P2, R2 any].
+struct Weird<P, R> {
+    P p;
+    R r;
+    Atom tag;
+};
+
+};

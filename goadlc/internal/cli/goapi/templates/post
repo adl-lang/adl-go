@@ -1,1 +1,0 @@
-	{{.Name | public}}(ctx {{.G.GoImport "context"}}Context{{if .IsCap}}, cp S{{end}}, req {{.G.GoType .Req .Annotations}}) ({{.G.GoType .Resp .Annotations}}, error)

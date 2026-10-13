@@ -15,3 +15,7 @@ tasks:
   gen_stdlib:
     cmds:
       - go run main.go -cfg ./cfgs/stdlib_go_adlc_config_go_.v2.cfg.json
+
+  test:
+    cmds:
+      - go test ./...

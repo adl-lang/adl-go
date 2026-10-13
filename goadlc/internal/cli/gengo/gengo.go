@@ -5,6 +5,7 @@ import (
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goapi"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gomod"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gotypes"
+	"github.com/adl-lang/adl-go/goadlc/internal/cli/govisitor"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/loader"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/root"
 )
@@ -14,12 +15,13 @@ type GenGo struct {
 }
 
 type _GenGo struct {
-	Root      *root.Root       `json:"-"`
-	Loader    *loader.Loader   `json:"Loader"`
-	Mod       *gomod.GoModule  `json:"Mod"`
-	ChangePWD string           `json:"ChangePWD"`
-	GoTypes   *gotypes.GoTypes `json:"GoTypes"`
-	GoApis    *[]goapi.GoApi   `json:"GoApis"`
+	Root      *root.Root           `json:"-"`
+	Loader    *loader.Loader       `json:"Loader"`
+	Mod       *gomod.GoModule      `json:"Mod"`
+	ChangePWD string               `json:"ChangePWD"`
+	GoTypes   *gotypes.GoTypes     `json:"GoTypes"`
+	GoApis    *[]goapi.GoApi       `json:"GoApis"`
+	GoVisitor *govisitor.GoVisitor `json:"GoVisitor"`
 }
 
 func MakeAll_GenGo(
@@ -29,6 +31,7 @@ func MakeAll_GenGo(
 	changepwd string,
 	gotypes *gotypes.GoTypes,
 	goapis *[]goapi.GoApi,
+	govisitor *govisitor.GoVisitor,
 ) GenGo {
 	return GenGo{
 		_GenGo{
@@ -38,6 +41,7 @@ func MakeAll_GenGo(
 			ChangePWD: changepwd,
 			GoTypes:   gotypes,
 			GoApis:    goapis,
+			GoVisitor: govisitor,
 		},
 	}
 }
@@ -55,6 +59,7 @@ func Make_GenGo(
 			ChangePWD: ((*GenGo)(nil)).Default_ChangePWD(),
 			GoTypes:   gotypes,
 			GoApis:    ((*GenGo)(nil)).Default_GoApis(),
+			GoVisitor: ((*GenGo)(nil)).Default_GoVisitor(),
 		},
 	}
 	return ret
@@ -67,5 +72,8 @@ func (*GenGo) Default_ChangePWD() string {
 	return ""
 }
 func (*GenGo) Default_GoApis() *[]goapi.GoApi {
+	return nil
+}
+func (*GenGo) Default_GoVisitor() *govisitor.GoVisitor {
 	return nil
 }

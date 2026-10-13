@@ -5,6 +5,7 @@ import cli.loader.Loader;
 import cli.gotypes.GoTypes;
 import cli.goapi.GoApi;
 import cli.gomod.GoModule;
+import cli.govisitor.GoVisitor;
 
 struct GenGo {
     @SerializedName "-"
@@ -17,6 +18,7 @@ struct GenGo {
     String ChangePWD = "";
     Nullable<GoTypes> GoTypes;
     Nullable<Vector<GoApi>> GoApis = null;
+    Nullable<GoVisitor> GoVisitor = null;
 };
 
 };

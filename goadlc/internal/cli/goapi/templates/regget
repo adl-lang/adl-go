@@ -1,3 +1,0 @@
-{{- $G := .G -}}
-	{{if .IsCap}}{{$G.GoImport .Module}}AdlCapGet(mux, reqs.{{.Name | public}}, srv.{{.Name | public}}, api, capr)
-	{{- else}}{{$G.GoImport  .Module}}AdlGet(mux, reqs.{{.Name | public}}, srv.{{.Name | public}}){{end}}

@@ -6,15 +6,12 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/adl-lang/adl-go/adl"
 	"github.com/adl-lang/adl-go/adl/sys/adlast"
-	"github.com/adl-lang/adl-go/adl/sys/types"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gogen"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goimports"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gomod"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/loader"
 
-	"github.com/samber/lo"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -58,61 +55,63 @@ func thunk_gen_module(
 			midPath = oabs[len(rabs)+1:]
 		}
 		path := in.Outputdir + "/" + strings.Join(modCodeGenDir, "/")
-		declBody := &gogen.Generator{
+		declGen := &gogen.Generator{
 			BaseGen: gogen.NewBaseGen(gm.ModulePath, midPath, m.Name, in, *in.Loader),
-			Rr:      gogen.TemplateRenderer{Tmpl: templates},
 		}
-		astBody := &gogen.Generator{
+		astGen := &gogen.Generator{
 			BaseGen: gogen.NewBaseGen(gm.ModulePath, midPath, m.Name, in, *in.Loader),
-			Rr:      gogen.TemplateRenderer{Tmpl: templates},
 		}
 		declsNames := []string{}
 		for k := range m.Module_.Decls {
 			declsNames = append(declsNames, k)
 		}
 		slices.Sort(declsNames)
+		var (
+			decls []declParams
+			asts  []astDeclParams
+		)
 		for _, k := range declsNames {
 			decl := m.Module_.Decls[k]
-			jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
-			gct, err := adl.GetAnnotation(decl.Annotations, gogen.GoCustomTypeSN, jb)
-			if err != nil {
-				panic(err)
+			if gogen.GoCustomTypeAnn(decl.Annotations) == nil {
+				if p, ok := makeDeclParams(declGen, decl); ok {
+					decls = append(decls, p)
+				}
 			}
-			if gct != nil {
-				if !in.ExcludeAst {
-					generalTexpr(astBody, decl)
-					generalReg(astBody, decl)
-				}
-			} else {
-				generalDeclV3(declBody, decl)
-				if !in.ExcludeAst {
-					generalTexpr(astBody, decl)
-					generalReg(astBody, decl)
-				}
+			if !in.ExcludeAst {
+				asts = append(asts, makeAstDeclParams(astGen, decl))
 			}
 		}
 
-		err := declBody.WriteFile(in.Root, modCodeGenPkg, filepath.Join(path, modCodeGenDir[len(modCodeGenDir)-1]+".go"), in.NoGoFmt, []goimports.ImportSpec{})
+		err := gogen.WriteFile(in.Root, filepath.Join(path, modCodeGenDir[len(modCodeGenDir)-1]+".go"), in.NoGoFmt,
+			&gogen.FileParams{
+				Pkg:      modCodeGenPkg,
+				G:        declGen,
+				BodyTmpl: "gotypes_decls_body",
+				BodyData: declsBodyParams{Decls: decls},
+			})
 		if err != nil {
 			return err
 		}
 		if !in.ExcludeAst {
 			fname := modCodeGenDir[len(modCodeGenDir)-1] + "_ast.go"
+			astFile := &gogen.FileParams{
+				Pkg:      modCodeGenPkg,
+				G:        astGen,
+				BodyTmpl: "gotypes_ast_body",
+				BodyData: astBodyParams{Decls: asts},
+			}
+			astPath := filepath.Join(path, fname)
 			if _, ok := in.specialTexpr()[m.Name]; ok && in.StdLibGen {
-				specialImports := []goimports.ImportSpec{{
+				astFile.Pkg = "adl"
+				astFile.Special = []goimports.ImportSpec{{
 					Path:    filepath.Join(in.GoAdlPath, strings.ReplaceAll(m.Name, ".", "/")),
 					Name:    ".",
 					Aliased: true,
 				}}
-				err = astBody.WriteFile(in.Root, "adl", filepath.Join(in.Outputdir, fname), in.NoGoFmt, specialImports)
-				if err != nil {
-					return err
-				}
-			} else {
-				err = astBody.WriteFile(in.Root, modCodeGenPkg, filepath.Join(path, fname), in.NoGoFmt, []goimports.ImportSpec{})
-				if err != nil {
-					return err
-				}
+				astPath = filepath.Join(in.Outputdir, fname)
+			}
+			if err = gogen.WriteFile(in.Root, astPath, in.NoGoFmt, astFile); err != nil {
+				return err
 			}
 		}
 		return nil
@@ -161,162 +160,71 @@ func (bg *GoTypes) GoAdlImportPath() string {
 	return bg._GoTypes.GoAdlPath
 }
 
-func generalDeclV3(
-	in *gogen.Generator,
-	decl adlast.Decl,
-) {
-	typeParams := gogen.TypeParamsFromDecl(decl)
-	adlast.Handle_DeclType[any](
-		decl.Type_,
-		func(s adlast.Struct) any {
-
-			in.Rr.Render(structParams{
-				G:          in,
-				Name:       decl.Name,
-				TypeParams: typeParams,
-				Fields: lo.Map(s.Fields, func(f adlast.Field, _ int) fieldParams {
-					return makeFieldParam(f, decl.Name, in)
-				}),
-				ContainsTypeToken: containsTypeToken(s),
-			})
-			return nil
-		},
-		func(u adlast.Union) any {
-			in.Rr.Render(unionParams{
-				G:          in,
-				Name:       decl.Name,
-				TypeParams: typeParams,
-				Branches: lo.Map[adlast.Field, fieldParams](u.Fields, func(f adlast.Field, _ int) fieldParams {
-					return makeFieldParam(f, decl.Name, in)
-				}),
-			})
-			return nil
-		},
-		func(td adlast.TypeDef) any {
-			if typ, ok := decl.Type_.Cast_type_(); ok {
-				if len(typ.TypeParams) != 0 {
-					// in go "type X<A any> = ..." isn't valid, skipping
-					return nil
-				}
-			}
-			in.Rr.Render(typeAliasParams{
-				G:           in,
-				Name:        decl.Name,
-				TypeParams:  typeParams,
-				TypeExpr:    td.TypeExpr,
-				Annotations: decl.Annotations,
-			})
-			return nil
-		},
-		func(nt adlast.NewType) any {
-			in.Rr.Render(newTypeParams{
-				G:           in,
-				Name:        decl.Name,
-				TypeParams:  typeParams,
-				TypeExpr:    nt.TypeExpr,
-				Annotations: decl.Annotations,
-			})
-			return nil
-		},
-		nil,
-	)
+// declsBodyParams is the body of a module's types file.
+type declsBodyParams struct {
+	Decls []declParams
 }
 
-func generalTexpr(
-	body *gogen.Generator,
-	decl adlast.Decl,
-) {
-	if typ, ok := decl.Type_.Cast_type_(); ok {
-		if len(typ.TypeParams) != 0 {
-			// in go "type X<A any> = ..." isn't valid, skipping
-			return
-		}
+// astBodyParams is the body of a module's _ast.go file.
+type astBodyParams struct {
+	Decls []astDeclParams
+}
+
+// astDeclParams is one decl's contribution to the _ast.go file: its Texpr_
+// func, which a generic type alias does not get, and its AST_ registration,
+// which every decl gets.
+type astDeclParams struct {
+	Texpr *aTexprParams
+	Reg   scopedDeclParams
+}
+
+// makeDeclParams builds the params for one decl of the types file. ok is
+// false for a generic type alias, which generates nothing: go has no
+// "type X[A any] = ...".
+func makeDeclParams(in *gogen.Generator, decl adlast.Decl) (p declParams, ok bool) {
+	if typ, isAlias := decl.Type_.Cast_type_(); isAlias && len(typ.TypeParams) != 0 {
+		return declParams{}, false
+	}
+	return declParams{
+		G:          in,
+		Decl:       decl,
+		Name:       decl.Name,
+		TypeParams: gogen.TypeParamsFromDecl(decl),
+	}, true
+}
+
+// makeAstDeclParams builds the params for one decl of the _ast.go file.
+func makeAstDeclParams(body *gogen.Generator, decl adlast.Decl) astDeclParams {
+	return astDeclParams{
+		Texpr: makeATexprParams(body, decl),
+		Reg: scopedDeclParams{
+			G:          body,
+			ModuleName: body.ModuleName,
+			Name:       decl.Name,
+			Decl:       decl,
+			TypeParams: gogen.TypeParamsFromDecl(decl),
+		},
+	}
+}
+
+// makeATexprParams returns nil for a generic type alias, which gets no
+// Texpr_ func.
+func makeATexprParams(body *gogen.Generator, decl adlast.Decl) *aTexprParams {
+	if typ, isAlias := decl.Type_.Cast_type_(); isAlias && len(typ.TypeParams) != 0 {
+		return nil
 	}
 	type_name := decl.Name
 	tp := gogen.TypeParamsFromDecl(decl)
-
-	jb := adl.CreateJsonDecodeBinding(adl.Texpr_GoCustomType(), adl.RESOLVER)
-	gct, err := adl.GetAnnotation(decl.Annotations, gogen.GoCustomTypeSN, jb)
-	if err != nil {
-		panic(err)
-	}
-	if gct != nil {
-		pkg := gct.Gotype.Import_path[strings.LastIndex(gct.Gotype.Import_path, "/")+1:]
-		spec := goimports.ImportSpec{
-			Path:    gct.Gotype.Import_path,
-			Name:    gct.Gotype.Pkg,
-			Aliased: gct.Gotype.Pkg != pkg,
-		}
-		body.Imports.AddSpec(spec)
+	if gct := gogen.GoCustomTypeAnn(decl.Annotations); gct != nil {
+		body.Imports.AddSpec(gogen.GoCustomTypeSpec(gct))
 		type_name = gct.Gotype.Pkg + "." + gct.Gotype.Name
 		tp.TypeConstraints = gct.Gotype.Type_constraints
 	}
-
-	// tp.stdlib = base.cli.StdLibGen
-	body.Rr.Render(aTexprParams{
+	return &aTexprParams{
 		G:          body,
 		ModuleName: body.ModuleName,
 		Name:       decl.Name,
 		TypeName:   type_name,
 		TypeParams: tp,
-	})
-}
-
-func generalReg(
-	body *gogen.Generator,
-	decl adlast.Decl,
-) {
-	tp := gogen.TypeParamsFromDecl(decl)
-	body.Rr.Render(scopedDeclParams{
-		G:          body,
-		ModuleName: body.ModuleName,
-		Name:       decl.Name,
-		Decl:       decl,
-		TypeParams: tp,
-	})
-}
-
-func makeFieldParam(
-	f adlast.Field,
-	declName string,
-	gen *gogen.Generator,
-) fieldParams {
-	isVoid := false
-	if pr, ok := f.TypeExpr.TypeRef.Cast_primitive(); ok {
-		if pr == "Void" {
-			isVoid = true
-		}
 	}
-	return types.Handle_Maybe[any, fieldParams](
-		f.Default,
-		func(nothing struct{}) fieldParams {
-			return fieldParams{
-				Field:      f,
-				DeclName:   declName,
-				G:          gen,
-				HasDefault: false,
-				IsVoid:     isVoid,
-			}
-		},
-		func(just any) fieldParams {
-			return fieldParams{
-				Field:      f,
-				DeclName:   declName,
-				G:          gen,
-				HasDefault: true,
-				Just:       just,
-				IsVoid:     isVoid,
-			}
-		},
-		nil,
-	)
-}
-
-func containsTypeToken(str adlast.Struct) bool {
-	for _, fld := range str.Fields {
-		if pr, ok := fld.TypeExpr.TypeRef.Cast_primitive(); ok && pr == "TypeToken" {
-			return true
-		}
-	}
-	return false
 }

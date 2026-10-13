@@ -1,0 +1,36 @@
+// M3 input: newtypes (plan4.md section 4.6) and a struct that references
+// every M3 shape. Path is a newtype over a Vector of a struct; Wrapped is
+// a newtype over a cross-module struct (its DefaultAccept converts to
+// *tree.Atom); Id is a newtype over a primitive (all leaf); Ids<T> is a
+// generic newtype whose underlying Vector<T> is a leaf.
+module m3.nt {
+
+import m2.tree.Atom;
+import m3.gen.Box;
+import m3.gen.Opt;
+import sys.types.Maybe;
+
+newtype Path = Vector<Atom>;
+
+newtype Wrapped = Atom;
+
+newtype Id = String;
+
+newtype Ids<T> = Vector<T>;
+
+/// Every field but maybe (a bundle generic) refers to a generated decl
+/// and is descended, in declaration order.
+struct Holder {
+    Box<Atom> box;
+    Box<String> sbox;
+    Opt<Atom> opt;
+    Path path;
+    Wrapped wrapped;
+    Id id;
+    Vector<Path> paths;
+    Nullable<Wrapped> nullWrapped;
+    Ids<Atom> ids;
+    Maybe<Atom> maybe;
+};
+
+};

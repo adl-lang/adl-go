@@ -25,6 +25,14 @@ func (in *GenGo) Run() error {
 			return err
 		}
 	}
+	if in.GoVisitor != nil {
+		in.GoVisitor.Root = in.Root
+		in.GoVisitor.Loader = ld
+		in.GoVisitor.GoMod = gm
+		if err := in.GoVisitor.Run(); err != nil {
+			return err
+		}
+	}
 	if in.GoApis != nil {
 		for _, api := range *in.GoApis {
 			api.Root = in.Root

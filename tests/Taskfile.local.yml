@@ -7,3 +7,11 @@ tasks:
   gen_exer:
     cmds:
       - go run ../goadlc/main.go -cfg ./cfgs/exer.cfg.json
+
+  gen_api:
+    cmds:
+      - go run ../goadlc/main.go -debug -cfg ./cfgs/api.cfg.json
+
+  test:
+    cmds:
+      - go test -v
