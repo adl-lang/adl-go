@@ -238,6 +238,27 @@ type _StructOfPrimitives struct {
 which is what lets the generated `Make_` constructors be the only way to build a value
 with defaults applied.
 
+`LeanTag: "<tag>"` puts `//go:build !<tag>` on each `<pkg>_ast.go`, so a build with
+the tag, such as one by TinyGo, links no registration and nothing of the reflective
+codec. The same field on `GoVisitor` makes each `Accept` call a package func,
+`adlTypeCheckMethod`, which `<pkg>_visitor_check.go` defines over
+`visit.TypeCheckMethod` under `!<tag>` and `<pkg>_visitor_lean.go` as a no-op under
+`<tag>`. Empty, the default, writes what it wrote before.
+
+### gojson: `<pkg>_json.go`
+
+[gojson_fn.go](internal/cli/gojson/gojson_fn.go), behind the config's `GoJson`, writes a
+static codec per struct, union and newtype: `Encode_X(w, v)`, `Decode_X(r, v)` and, with
+`Equal`, `Equal_X(a, b)`, over the runtime in `adl/gojson`. A generic decl's funcs take
+one codec per type param. The JSON is the reflective codec's, byte for byte: every
+field in decl order, a union as `{"branch":value}`, an enum as `"branch"`, a
+`StringMap` with its keys in order. A decoder reads a union as a string or an object,
+sets a missing field to its `Default_`, and refuses a missing field with no default and
+a field the struct lacks. Neither the runtime nor the output imports `reflect` or
+`encoding/json`. `sys.types`' `Maybe`, `Pair` and `Either` are in the runtime; `Json`,
+`TypeToken`, a `go_custom_type` and any other bundle decl refuse the generation. The body
+is Go source written by the backend, through the `text_body` template.
+
 ### goapi: `<pkg>_srv.go`
 
 [goapi_fn.go](internal/cli/goapi/goapi_fn.go) starts at one struct named by
