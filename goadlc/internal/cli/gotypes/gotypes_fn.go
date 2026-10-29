@@ -100,6 +100,9 @@ func thunk_gen_module(
 				BodyTmpl: "gotypes_ast_body",
 				BodyData: astBodyParams{Decls: asts},
 			}
+			if in.LeanTag != "" {
+				astFile.BuildTag = "!" + in.LeanTag
+			}
 			astPath := filepath.Join(path, fname)
 			if _, ok := in.specialTexpr()[m.Name]; ok && in.StdLibGen {
 				astFile.Pkg = "adl"

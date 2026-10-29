@@ -6,6 +6,7 @@ import cli.gotypes.GoTypes;
 import cli.goapi.GoApi;
 import cli.gomod.GoModule;
 import cli.govisitor.GoVisitor;
+import cli.gojson.GoJson;
 
 struct GenGo {
     @SerializedName "-"
@@ -19,6 +20,7 @@ struct GenGo {
     Nullable<GoTypes> GoTypes;
     Nullable<Vector<GoApi>> GoApis = null;
     Nullable<GoVisitor> GoVisitor = null;
+    Nullable<GoJson> GoJson = null;
 };
 
 };

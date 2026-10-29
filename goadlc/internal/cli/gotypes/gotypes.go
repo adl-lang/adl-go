@@ -19,6 +19,7 @@ type _GoTypes struct {
 	GoAdlPath  string             `json:"GoAdlPath"`
 	ExcludeAst bool               `json:"ExcludeAst"`
 	StdLibGen  bool               `json:"StdLibGen"`
+	LeanTag    string             `json:"LeanTag"`
 	Outputdir  string             `json:"Outputdir"`
 }
 
@@ -30,6 +31,7 @@ func MakeAll_GoTypes(
 	goadlpath string,
 	excludeast bool,
 	stdlibgen bool,
+	leantag string,
 	outputdir string,
 ) GoTypes {
 	return GoTypes{
@@ -41,6 +43,7 @@ func MakeAll_GoTypes(
 			GoAdlPath:  goadlpath,
 			ExcludeAst: excludeast,
 			StdLibGen:  stdlibgen,
+			LeanTag:    leantag,
 			Outputdir:  outputdir,
 		},
 	}
@@ -58,6 +61,7 @@ func Make_GoTypes(
 			GoAdlPath:  ((*GoTypes)(nil)).Default_GoAdlPath(),
 			ExcludeAst: ((*GoTypes)(nil)).Default_ExcludeAst(),
 			StdLibGen:  ((*GoTypes)(nil)).Default_StdLibGen(),
+			LeanTag:    ((*GoTypes)(nil)).Default_LeanTag(),
 			Outputdir:  outputdir,
 		},
 	}
@@ -84,4 +88,7 @@ func (*GoTypes) Default_ExcludeAst() bool {
 }
 func (*GoTypes) Default_StdLibGen() bool {
 	return false
+}
+func (*GoTypes) Default_LeanTag() string {
+	return ""
 }

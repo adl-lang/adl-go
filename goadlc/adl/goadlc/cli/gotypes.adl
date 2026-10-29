@@ -19,6 +19,10 @@ struct GoTypes {
     Bool ExcludeAst = false;
     /// Used for bootstrapping, only use when generating the sys.aldast & sys.types modules
     Bool StdLibGen = false;
+    /// A build tag that leaves the _ast.go files out: they carry the line
+    /// //go:build !<LeanTag>, so a build with the tag, such as one by TinyGo,
+    /// links no registration and no reflective codec. Empty writes no line.
+    String LeanTag = "";
     /// output dir
     String Outputdir;
 };

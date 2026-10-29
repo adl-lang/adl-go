@@ -20,6 +20,12 @@ struct GoVisitor {
     Vector<String> Modules = [];
     /// Omit the visit.TypeCheckMethod call from each Accept
     Bool SkipTypeCheckMethod = false;
+    /// A build tag under which the visit.TypeCheckMethod call is left out:
+    /// each Accept calls a package func, adlTypeCheckMethod, written in
+    /// <pkg>_visitor_check.go under //go:build !<LeanTag> and as a no-op in
+    /// <pkg>_visitor_lean.go under //go:build <LeanTag>, so a build with the
+    /// tag imports no visit and no reflect. Empty calls visit as before.
+    String LeanTag = "";
     /// output dir; must be the same as GoTypes.Outputdir
     String Outputdir;
 };

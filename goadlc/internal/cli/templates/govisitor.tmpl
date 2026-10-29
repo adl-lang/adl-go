@@ -83,7 +83,7 @@ func (node *{{.NodeType}}) Accept{{.MethodTP}}(visitor any, payload {{.P}}) (res
 		result, err = v.Visit{{.Name}}(node, payload)
 		return
 	}
-{{if not .SkipTypeCheckMethod}}	{{.G.GoImport "visit"}}TypeCheckMethod{{.MethodTA}}(visitor, "{{.Name}}", node)
+{{if not .SkipTypeCheckMethod}}	{{if .LeanTag}}adlTypeCheckMethod{{else}}{{.G.GoImport "visit"}}TypeCheckMethod{{end}}{{.MethodTA}}(visitor, "{{.Name}}", node)
 {{end}}	return node.DefaultAccept{{.MethodTA}}(visitor, payload)
 }
 {{end}}
@@ -167,4 +167,23 @@ func (node *{{$D.NodeType}}) Accept{{.Name}}{{$D.MethodTP}}(visitor any, payload
 {{define "stringmapVisit"}}	for _, {{.Key}} := range {{$G.GoImport "slices"}}Sorted({{$G.GoImport "maps"}}Keys({{.Expr}})) {
 		{{.Val}} := {{.Indexed .Key}}
 {{tmpl_by_type .Elem "" ""}}	}
+{{end}}
+
+{{/*
+The two halves of adlTypeCheckMethod, under GoVisitor.LeanTag: the check
+for a build without the tag, and a no-op for a build with it.
+*/}}
+{{define "govisitor_check_body"}}
+// adlTypeCheckMethod is visit.TypeCheckMethod. A build with the tag
+// {{.LeanTag}} has the no-op of {{.Pkg}}_visitor_lean.go instead, and
+// imports no visit and no reflect.
+func adlTypeCheckMethod[P, R any](v any, typeName string, node any) {
+	{{.G.GoImport "visit"}}TypeCheckMethod[P, R](v, typeName, node)
+}
+{{end}}
+
+{{define "govisitor_lean_body"}}
+// adlTypeCheckMethod checks nothing in a build with the tag {{.LeanTag}}:
+// visit.TypeCheckMethod reflects. {{.Pkg}}_visitor_check.go is the check.
+func adlTypeCheckMethod[P, R any](v any, typeName string, node any) {}
 {{end}}

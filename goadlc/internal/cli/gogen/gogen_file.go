@@ -26,6 +26,8 @@ type FileParams struct {
 	// Special are imports the caller knows about up front, appended after
 	// the ones discovered by rendering.
 	Special []goimports.ImportSpec
+	// BuildTag, when set, is the file's //go:build expression.
+	BuildTag string
 
 	body *string
 }
@@ -58,4 +60,10 @@ func (p *FileParams) Imports() []goimports.ImportSpec {
 		}
 	}
 	return append(used, p.Special...)
+}
+
+// TextBody is the BodyData of the "text_body" template: a body written as
+// Go source by the backend, whose imports are already on G.
+type TextBody struct {
+	Text string
 }

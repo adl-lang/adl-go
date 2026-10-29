@@ -9,6 +9,14 @@ import (
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/loader"
 )
 
+// leanBodyParams is the body of a module's _visitor_check.go or
+// _visitor_lean.go file, under GoVisitor.LeanTag.
+type leanBodyParams struct {
+	G       *gogen.Generator
+	Pkg     string
+	LeanTag string
+}
+
 // visitorBodyParams is the body of a module's _visitor.go file.
 type visitorBodyParams struct {
 	Decls []visitorDeclParams
@@ -45,6 +53,9 @@ type visitorDeclParams struct {
 	MethodTA string
 	// SkipTypeCheckMethod omits the visit.TypeCheckMethod call from Accept.
 	SkipTypeCheckMethod bool
+	// LeanTag, when set, makes Accept call the package's
+	// adlTypeCheckMethod, which a build with the tag has as a no-op.
+	LeanTag string
 	// Fields are a struct's fields in declaration order.
 	Fields []acceptFieldParams
 	// Branches are a union's branches in declaration order.

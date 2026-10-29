@@ -1,0 +1,31 @@
+module cli.gojson {
+
+import cli.root.Root;
+import cli.loader.LoadResult;
+import cli.gomod.GoModResult;
+
+/// A static JSON codec per decl: Encode_, Decode_ and Equal_ funcs that
+/// read and write the same ADL JSON as the reflective codec of package
+/// adl, with no reflect, over the runtime in <GoAdlPath>/gojson. One
+/// <pkg>_json.go per module, beside the <pkg>.go that gotypes wrote.
+struct GoJson {
+    @SerializedName "-"
+    Nullable<Root> root = null;
+    @SerializedName "-"
+    Nullable<LoadResult> loader = null;
+    @SerializedName "-"
+    Nullable<GoModResult> goMod = null;
+    /// Don't run 'go fmt' on the generated files
+    Bool NoGoFmt = false;
+    /// The path to the Go ADL runtime import; the codec runtime is <GoAdlPath>/gojson
+    String GoAdlPath = "github.com/adl-lang/adl-go/adl";
+    /// ADL modules to generate codecs for. Empty means every loaded module
+    /// (bundle modules such as sys.* are never generated)
+    Vector<String> Modules = [];
+    /// Also write an Equal_ func per decl
+    Bool Equal = true;
+    /// output dir; must be the same as GoTypes.Outputdir
+    String Outputdir;
+};
+
+};

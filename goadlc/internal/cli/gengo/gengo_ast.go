@@ -185,6 +185,30 @@ func AST_GenGo() adlast.ScopedDecl {
 						),
 						customtypes.MapMap[adlast.ScopedName, any]{},
 					),
+					adlast.MakeAll_Field(
+						"GoJson",
+						"GoJson",
+						adlast.MakeAll_TypeExpr(
+							adlast.Make_TypeRef_primitive(
+								"Nullable",
+							),
+							[]adlast.TypeExpr{
+								adlast.MakeAll_TypeExpr(
+									adlast.Make_TypeRef_reference(
+										adlast.MakeAll_ScopedName(
+											"cli.gojson",
+											"GoJson",
+										),
+									),
+									[]adlast.TypeExpr{},
+								),
+							},
+						),
+						types.Make_Maybe_just[any](
+							nil,
+						),
+						customtypes.MapMap[adlast.ScopedName, any]{},
+					),
 				},
 			),
 		),

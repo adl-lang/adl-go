@@ -185,7 +185,7 @@ func (in *GoVisitor) thunkGenModule(
 		if len(decls) == 0 {
 			return nil
 		}
-		return gogen.WriteFile(in.Root, filepath.Join(dir, modCodeGenPkg+"_visitor.go"), in.NoGoFmt,
+		if err := gogen.WriteFile(in.Root, filepath.Join(dir, modCodeGenPkg+"_visitor.go"), in.NoGoFmt,
 			&gogen.FileParams{
 				Pkg:      modCodeGenPkg,
 				G:        gen,
@@ -193,8 +193,55 @@ func (in *GoVisitor) thunkGenModule(
 				BodyData: visitorBodyParams{
 					Decls: decls,
 				},
-			})
+			}); err != nil {
+			return err
+		}
+		if in.LeanTag == "" || in.SkipTypeCheckMethod {
+			return nil
+		}
+		return in.writeLeanFiles(dir, midPath, m.Name, modCodeGenPkg)
 	}
+}
+
+// writeLeanFiles writes the two halves of adlTypeCheckMethod beside the
+// visitor file: the check under //go:build !LeanTag, and a no-op under
+// //go:build LeanTag.
+func (in *GoVisitor) writeLeanFiles(dir, midPath, module, pkg string) error {
+	var (
+		check = &gogen.Generator{
+			BaseGen: gogen.NewBaseGen(in.GoMod.ModulePath, midPath, module, in, *in.Loader),
+		}
+		lean = &gogen.Generator{
+			BaseGen: gogen.NewBaseGen(in.GoMod.ModulePath, midPath, module, in, *in.Loader),
+		}
+		err error
+	)
+	if err = gogen.WriteFile(in.Root, filepath.Join(dir, pkg+"_visitor_check.go"), in.NoGoFmt,
+		&gogen.FileParams{
+			Pkg:      pkg,
+			G:        check,
+			BodyTmpl: "govisitor_check_body",
+			BodyData: leanBodyParams{
+				G:       check,
+				Pkg:     pkg,
+				LeanTag: in.LeanTag,
+			},
+			BuildTag: "!" + in.LeanTag,
+		}); err != nil {
+		return err
+	}
+	return gogen.WriteFile(in.Root, filepath.Join(dir, pkg+"_visitor_lean.go"), in.NoGoFmt,
+		&gogen.FileParams{
+			Pkg:      pkg,
+			G:        lean,
+			BodyTmpl: "govisitor_lean_body",
+			BodyData: leanBodyParams{
+				G:       lean,
+				Pkg:     pkg,
+				LeanTag: in.LeanTag,
+			},
+			BuildTag: in.LeanTag,
+		})
 }
 
 // makeDeclParams builds the params of one generated struct, union or
@@ -272,6 +319,7 @@ func (in *GoVisitor) makeDeclParams(
 		MethodTP:            typeParamList(pr),
 		MethodTA:            typeArgList(pr),
 		SkipTypeCheckMethod: in.SkipTypeCheckMethod,
+		LeanTag:             in.LeanTag,
 		Fields:              fields,
 		Branches:            branches,
 		Underlying:          underlying,

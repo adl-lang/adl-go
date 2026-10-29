@@ -3,6 +3,7 @@ package gengo
 
 import (
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/goapi"
+	"github.com/adl-lang/adl-go/goadlc/internal/cli/gojson"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gomod"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/gotypes"
 	"github.com/adl-lang/adl-go/goadlc/internal/cli/govisitor"
@@ -22,6 +23,7 @@ type _GenGo struct {
 	GoTypes   *gotypes.GoTypes     `json:"GoTypes"`
 	GoApis    *[]goapi.GoApi       `json:"GoApis"`
 	GoVisitor *govisitor.GoVisitor `json:"GoVisitor"`
+	GoJson    *gojson.GoJson       `json:"GoJson"`
 }
 
 func MakeAll_GenGo(
@@ -32,6 +34,7 @@ func MakeAll_GenGo(
 	gotypes *gotypes.GoTypes,
 	goapis *[]goapi.GoApi,
 	govisitor *govisitor.GoVisitor,
+	gojson *gojson.GoJson,
 ) GenGo {
 	return GenGo{
 		_GenGo{
@@ -42,6 +45,7 @@ func MakeAll_GenGo(
 			GoTypes:   gotypes,
 			GoApis:    goapis,
 			GoVisitor: govisitor,
+			GoJson:    gojson,
 		},
 	}
 }
@@ -60,6 +64,7 @@ func Make_GenGo(
 			GoTypes:   gotypes,
 			GoApis:    ((*GenGo)(nil)).Default_GoApis(),
 			GoVisitor: ((*GenGo)(nil)).Default_GoVisitor(),
+			GoJson:    ((*GenGo)(nil)).Default_GoJson(),
 		},
 	}
 	return ret
@@ -75,5 +80,8 @@ func (*GenGo) Default_GoApis() *[]goapi.GoApi {
 	return nil
 }
 func (*GenGo) Default_GoVisitor() *govisitor.GoVisitor {
+	return nil
+}
+func (*GenGo) Default_GoJson() *gojson.GoJson {
 	return nil
 }

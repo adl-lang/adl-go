@@ -162,6 +162,20 @@ func AST_GoVisitor() adlast.ScopedDecl {
 						customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("sys.annotations", "Doc"): "Omit the visit.TypeCheckMethod call from each Accept\n"},
 					),
 					adlast.MakeAll_Field(
+						"LeanTag",
+						"LeanTag",
+						adlast.MakeAll_TypeExpr(
+							adlast.Make_TypeRef_primitive(
+								"String",
+							),
+							[]adlast.TypeExpr{},
+						),
+						types.Make_Maybe_just[any](
+							"",
+						),
+						customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("sys.annotations", "Doc"): "A build tag under which the visit.TypeCheckMethod call is left out:\neach Accept calls a package func, adlTypeCheckMethod, written in\n<pkg>_visitor_check.go under //go:build !<LeanTag> and as a no-op in\n<pkg>_visitor_lean.go under //go:build <LeanTag>, so a build with the\ntag imports no visit and no reflect. Empty calls visit as before.\n"},
+					),
+					adlast.MakeAll_Field(
 						"Outputdir",
 						"Outputdir",
 						adlast.MakeAll_TypeExpr(

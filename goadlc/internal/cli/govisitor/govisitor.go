@@ -19,6 +19,7 @@ type _GoVisitor struct {
 	GoAdlPath           string             `json:"GoAdlPath"`
 	Modules             []string           `json:"Modules"`
 	SkipTypeCheckMethod bool               `json:"SkipTypeCheckMethod"`
+	LeanTag             string             `json:"LeanTag"`
 	Outputdir           string             `json:"Outputdir"`
 }
 
@@ -30,6 +31,7 @@ func MakeAll_GoVisitor(
 	goadlpath string,
 	modules []string,
 	skiptypecheckmethod bool,
+	leantag string,
 	outputdir string,
 ) GoVisitor {
 	return GoVisitor{
@@ -41,6 +43,7 @@ func MakeAll_GoVisitor(
 			GoAdlPath:           goadlpath,
 			Modules:             modules,
 			SkipTypeCheckMethod: skiptypecheckmethod,
+			LeanTag:             leantag,
 			Outputdir:           outputdir,
 		},
 	}
@@ -58,6 +61,7 @@ func Make_GoVisitor(
 			GoAdlPath:           ((*GoVisitor)(nil)).Default_GoAdlPath(),
 			Modules:             ((*GoVisitor)(nil)).Default_Modules(),
 			SkipTypeCheckMethod: ((*GoVisitor)(nil)).Default_SkipTypeCheckMethod(),
+			LeanTag:             ((*GoVisitor)(nil)).Default_LeanTag(),
 			Outputdir:           outputdir,
 		},
 	}
@@ -84,4 +88,7 @@ func (*GoVisitor) Default_Modules() []string {
 }
 func (*GoVisitor) Default_SkipTypeCheckMethod() bool {
 	return false
+}
+func (*GoVisitor) Default_LeanTag() string {
+	return ""
 }

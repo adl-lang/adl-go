@@ -33,6 +33,14 @@ func (in *GenGo) Run() error {
 			return err
 		}
 	}
+	if in.GoJson != nil {
+		in.GoJson.Root = in.Root
+		in.GoJson.Loader = ld
+		in.GoJson.GoMod = gm
+		if err := in.GoJson.Run(); err != nil {
+			return err
+		}
+	}
 	if in.GoApis != nil {
 		for _, api := range *in.GoApis {
 			api.Root = in.Root

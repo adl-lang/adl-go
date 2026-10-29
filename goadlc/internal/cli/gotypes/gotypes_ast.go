@@ -155,6 +155,20 @@ func AST_GoTypes() adlast.ScopedDecl {
 						customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("sys.annotations", "Doc"): "Used for bootstrapping, only use when generating the sys.aldast & sys.types modules\n"},
 					),
 					adlast.MakeAll_Field(
+						"LeanTag",
+						"LeanTag",
+						adlast.MakeAll_TypeExpr(
+							adlast.Make_TypeRef_primitive(
+								"String",
+							),
+							[]adlast.TypeExpr{},
+						),
+						types.Make_Maybe_just[any](
+							"",
+						),
+						customtypes.MapMap[adlast.ScopedName, any]{adlast.Make_ScopedName("sys.annotations", "Doc"): "A build tag that leaves the _ast.go files out: they carry the line\n//go:build !<LeanTag>, so a build with the tag, such as one by TinyGo,\nlinks no registration and no reflective codec. Empty writes no line.\n"},
+					),
+					adlast.MakeAll_Field(
 						"Outputdir",
 						"Outputdir",
 						adlast.MakeAll_TypeExpr(
