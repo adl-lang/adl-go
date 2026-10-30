@@ -3,7 +3,7 @@ module github.com/adl-lang/adl-go/goadlc
 go 1.26.4
 
 require (
-	github.com/adl-lang/adl-go/adl v1.1.1
+	github.com/adl-lang/adl-go/adl v1.2.0
 	github.com/mattn/go-zglob v0.0.8
 	github.com/millergarym/gotmpl v1.2.0
 	github.com/samber/lo v1.53.0
