@@ -3,7 +3,7 @@
 // generated/m2/{tree,extra} packages and run hand-written visitors over
 // hand-built values; nothing here compares against golden files.
 //
-// m2.tree is sheafdb's tree.adl: Node, Path and Part are unions whose
+// m2.tree is a host project's tree.adl: Node, Path and Part are unions whose
 // branches are structs (or, for Part.index and SeqSpec.nums, leaves).
 // m2.extra adds the branch shapes tree.adl lacks: Void, Vector, Nullable,
 // StringMap and String, all over the cross-module tree.Atom, and a struct

@@ -1,4 +1,4 @@
-// M2 input: sheafdb/samples/goohm/tree.adl with the module renamed. Every
+// M2 input: a host project's tree.adl with the module renamed. Every
 // decl is kept as is. The unions Node, SeqSpec, Path and Part exercise
 // section 4.4 of plan4.md: struct branches, a union branch (Node.ref ->
 // Ref.path -> Path), a bundle-generic leaf branch (SeqSpec.nums) and a

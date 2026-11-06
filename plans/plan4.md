@@ -9,7 +9,7 @@ The model is the ohm-go visitor, in its generic-methods flavour only:
 `ohm-cli/docs/visitors.md` sections 3, 5 and 6 (in
 `/Users/garymiller/devel/ohmjs/ohm-go`), its templates in
 `ohm-cli/ruleast/templates/go_{interfaces,accepts}.tmpl`, and the
-hand-converted sample in `sheafdb/samples/goohm/tree_visitor/`. The
+hand-converted sample in a host project. The
 struct-generics flavour is **not** supported: the generated code uses
 methods with their own type parameters, so a module that consumes it
 needs `go 1.27` or later in its `go.mod`. goadlc itself (go 1.26.4) only
@@ -431,9 +431,8 @@ visitor_tests/
 Root `Taskfile.yml` gains an include for it and `gen`/`test` entries.
 
 Tests are behavioural, not golden-file: they compile the generated code
-and run visitors over hand-built values. The sheafdb `tree.adl`
-(`sheafdb/samples/goohm/tree.adl`) is a good M2 input, because its
-visitor (`ast/build.go`) is what this generator is ultimately for.
+and run visitors over hand-built values. A host project's `tree.adl` is a
+good M2 input, because its visitor is what this generator is ultimately for.
 
 ## 7. Milestones
 
@@ -466,6 +465,6 @@ primitive branch as leaves.
 `T` field and a `Vector<T>` field visited with concrete and leaf `T`;
 a newtype over a `Vector` of a struct.
 
-After M3: adopt in `sheafdb/samples/goohm` (`adl.cfg.json` gains a
+After M3: adopt in the host project (`adl.cfg.json` gains a
 `GoVisitor` entry and `ast/` gets a visitor over the ADL tree) - a
 follow-up, not part of this plan.

@@ -13,8 +13,7 @@ a result type `R` that flows back up, and call `Accept` on the root.
 The machinery is the generic-methods flavour of the visitor that
 `ohm-cli generate go --generic-methods` produces for an Ohm grammar, applied
 to ADL declarations instead of grammar rules. If you have built an ADL AST
-from a parse tree with that toolchain (the `samples/goohm` module and
-`docs/grammar2ast.md` in the sheafdb repository), this is the second half:
+from a parse tree with that toolchain, this is the second half:
 the ohm visitor builds the ADL values, and the ADL visitor walks them.
 
 This document covers:
@@ -767,7 +766,7 @@ one set of nodes. The printer renders a value as text with `P = any` and
 and a count result, `R = int`, and records the deepest atom it saw. The
 output shown in the comments is what the program prints against the code
 goadlc generates for that module. A longer example in the same style, over
-the sheafdb `tree.adl` with its `Ref`, `Seq` and `Path` types, is
+a `tree.adl` with its `Ref`, `Seq` and `Path` types, is
 `visitor_tests/m2/m2_test.go` (`printer` and `counter`), and
 `visitor_tests/m1` and `m3` do the same for the struct and the generics and
 newtype shapes.
